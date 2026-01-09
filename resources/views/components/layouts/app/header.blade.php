@@ -10,8 +10,33 @@
             <x-app-logo href="{{ route('dashboard') }}" wire:navigate />
 
             <flux:navbar class="-mb-px max-lg:hidden">
-                <flux:navbar.item icon="layout-grid" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>
+                <flux:navbar.item :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>
+                    <span class="material-icons mr-2">dashboard</span>
                     {{ __('Dashboard') }}
+                </flux:navbar.item>
+                <flux:navbar.item :href="route('borrowers')" :current="request()->routeIs('borrowers')" wire:navigate>
+                    <span class="material-icons mr-2">group</span>
+                    {{ __('Borrower List') }}
+                </flux:navbar.item>
+                <flux:navbar.item :href="route('loans')" :current="request()->routeIs('loans')" wire:navigate>
+                    <span class="material-icons mr-2">account_balance</span>
+                    {{ __('Loan Management') }}
+                </flux:navbar.item>
+                <flux:navbar.item :href="route('payments')" :current="request()->routeIs('payments')" wire:navigate>
+                    <span class="material-icons mr-2">payment</span>
+                    {{ __('Payment Management') }}
+                </flux:navbar.item>
+                <flux:navbar.item :href="route('paid_loans')" :current="request()->routeIs('paid_loans')" wire:navigate>
+                    <span class="material-icons mr-2">history</span>
+                    {{ __('Paid / Completed Loans History') }}
+                </flux:navbar.item>
+                <flux:navbar.item :href="route('income_expense')" :current="request()->routeIs('income_expense')" wire:navigate>
+                    <span class="material-icons mr-2">bar_chart</span>
+                    {{ __('Income & Expense Tracking') }}
+                </flux:navbar.item>
+                <flux:navbar.item :href="route('reports')" :current="request()->routeIs('reports')" wire:navigate>
+                    <span class="material-icons mr-2">assessment</span>
+                    {{ __('Reports & Search Filters') }}
                 </flux:navbar.item>
             </flux:navbar>
 
@@ -53,8 +78,33 @@
 
             <flux:sidebar.nav>
                 <flux:sidebar.group :heading="__('Platform')">
-                    <flux:sidebar.item icon="layout-grid" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>
+                    <flux:sidebar.item :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>
+                        <span class="material-icons mr-2">dashboard</span>
                         {{ __('Dashboard')  }}
+                    </flux:sidebar.item>
+                    <flux:sidebar.item :href="route('borrowers')" :current="request()->routeIs('borrowers')" wire:navigate>
+                        <span class="material-icons mr-2">group</span>
+                        {{ __('Borrower List') }}
+                    </flux:sidebar.item>
+                    <flux:sidebar.item :href="route('loans')" :current="request()->routeIs('loans')" wire:navigate>
+                        <span class="material-icons mr-2">account_balance</span>
+                        {{ __('Loan Management') }}
+                    </flux:sidebar.item>
+                    <flux:sidebar.item :href="route('payments')" :current="request()->routeIs('payments')" wire:navigate>
+                        <span class="material-icons mr-2">payment</span>
+                        {{ __('Payment Management') }}
+                    </flux:sidebar.item>
+                    <flux:sidebar.item :href="route('paid_loans')" :current="request()->routeIs('paid_loans')" wire:navigate>
+                        <span class="material-icons mr-2">history</span>
+                        {{ __('Paid / Completed Loans History') }}
+                    </flux:sidebar.item>
+                    <flux:sidebar.item :href="route('income_expense')" :current="request()->routeIs('income_expense')" wire:navigate>
+                        <span class="material-icons mr-2">bar_chart</span>
+                        {{ __('Income & Expense Tracking') }}
+                    </flux:sidebar.item>
+                    <flux:sidebar.item :href="route('reports')" :current="request()->routeIs('reports')" wire:navigate>
+                        <span class="material-icons mr-2">assessment</span>
+                        {{ __('Reports & Search Filters') }}
                     </flux:sidebar.item>
                 </flux:sidebar.group>
             </flux:sidebar.nav>
