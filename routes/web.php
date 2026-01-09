@@ -10,4 +10,6 @@ Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
+Route::view('landing', 'landing');
+
 require __DIR__.'/settings.php';
