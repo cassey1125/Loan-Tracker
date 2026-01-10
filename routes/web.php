@@ -54,6 +54,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('investor-profit', function () {
         return view('investor-profit');
     })->name('investor-profit');
+
+    Route::get('investor-profit/pdf', [App\Http\Controllers\InvestorProfitController::class, 'downloadPdf'])
+        ->name('investor-profit.pdf');
 });
 
 Route::view('loans', 'loans')
