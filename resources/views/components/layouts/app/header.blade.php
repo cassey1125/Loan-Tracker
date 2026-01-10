@@ -14,7 +14,7 @@
                     <span class="material-icons mr-2">dashboard</span>
                     {{ __('Dashboard') }}
                 </flux:navbar.item>
-                <flux:navbar.item :href="route('borrowers')" :current="request()->routeIs('borrowers')" wire:navigate>
+                <flux:navbar.item :href="route('borrowers.index')" :current="request()->routeIs('borrowers.*')" wire:navigate>
                     <span class="material-icons mr-2">group</span>
                     {{ __('Borrower List') }}
                 </flux:navbar.item>

@@ -2,6 +2,12 @@
 
 namespace App\Providers;
 
+use App\Models\Loan;
+use App\Models\Payment;
+use App\Observers\LoanObserver;
+use App\Observers\PaymentObserver;
+use App\Services\Loan\Interest\FlatRateInterestStrategy;
+use App\Services\Loan\Interest\InterestCalculationStrategy;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -11,7 +17,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->bind(InterestCalculationStrategy::class, FlatRateInterestStrategy::class);
     }
 
     /**
@@ -19,6 +25,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        Loan::observe(LoanObserver::class);
+        Payment::observe(PaymentObserver::class);
     }
 }
