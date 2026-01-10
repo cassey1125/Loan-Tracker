@@ -26,7 +26,7 @@ class LoanRepository
             ->get();
     }
 
-    public function getPaidLoans($search = null, $dateFrom = null, $dateTo = null): Collection
+    public function getPaidLoans($search = null, $loanId = null, $completionDateFrom = null, $completionDateTo = null, $startDateFrom = null, $startDateTo = null): Collection
     {
         $query = Loan::with('borrower')
             ->where('status', LoanStatus::PAID);
@@ -38,12 +38,24 @@ class LoanRepository
             });
         }
 
-        if ($dateFrom) {
-            $query->whereDate('updated_at', '>=', $dateFrom);
+        if ($loanId) {
+            $query->where('id', $loanId);
         }
 
-        if ($dateTo) {
-            $query->whereDate('updated_at', '<=', $dateTo);
+        if ($completionDateFrom) {
+            $query->whereDate('updated_at', '>=', $completionDateFrom);
+        }
+
+        if ($completionDateTo) {
+            $query->whereDate('updated_at', '<=', $completionDateTo);
+        }
+
+        if ($startDateFrom) {
+            $query->whereDate('created_at', '>=', $startDateFrom);
+        }
+
+        if ($startDateTo) {
+            $query->whereDate('created_at', '<=', $startDateTo);
         }
 
         return $query->latest('updated_at')->get();

@@ -31,6 +31,10 @@
                     <span class="material-icons mr-2">payment</span>
                     {{ __('Payment Management') }}
                 </flux:sidebar.item>
+                <flux:sidebar.item :href="route('funds')" :current="request()->routeIs('funds')" wire:navigate>
+                    <span class="material-icons mr-2">account_balance_wallet</span>
+                    {{ __('Funds') }}
+                </flux:sidebar.item>
                 <flux:sidebar.item :href="route('paid_loans')" :current="request()->routeIs('paid_loans')"
                     wire:navigate>
                     <span class="material-icons mr-2">history</span>

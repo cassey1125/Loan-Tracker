@@ -63,6 +63,10 @@ Route::view('loans', 'loans')
     ->middleware(['auth', 'verified'])
     ->name('loans');
 
+Route::view('funds', 'funds')
+    ->middleware(['auth', 'verified'])
+    ->name('funds');
+
 Route::view('payments', 'payments')
     ->middleware(['auth', 'verified'])
     ->name('payments');

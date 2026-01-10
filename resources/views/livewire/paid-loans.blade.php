@@ -1,10 +1,15 @@
 <div class="space-y-6">
     <!-- Filters -->
     <div class="bg-white p-6 rounded-lg shadow-md">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
+        <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 items-end">
             <div>
                 <label for="search" class="block text-sm font-medium text-gray-700">Search Borrower</label>
                 <input type="text" wire:model.live.debounce.300ms="search" id="search" placeholder="Enter borrower name..." class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border">
+            </div>
+
+            <div>
+                <label for="loanId" class="block text-sm font-medium text-gray-700">Loan ID</label>
+                <input type="text" wire:model.live.debounce.300ms="loanId" id="loanId" placeholder="Loan ID" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border">
             </div>
             
             <div>
@@ -17,9 +22,21 @@
                 <input type="date" wire:model.live="dateTo" id="dateTo" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border">
             </div>
 
-            <div class="bg-green-50 p-3 rounded-md border border-green-200 text-center">
-                <span class="block text-xs font-medium text-green-600 uppercase tracking-wider">Total Income</span>
-                <span class="block text-xl font-bold text-green-700">₱{{ number_format($totalIncome, 2) }}</span>
+            <div>
+                <label for="startDateFrom" class="block text-sm font-medium text-gray-700">Loan Start Date (From)</label>
+                <input type="date" wire:model.live="startDateFrom" id="startDateFrom" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border">
+            </div>
+
+            <div>
+                <label for="startDateTo" class="block text-sm font-medium text-gray-700">Loan Start Date (To)</label>
+                <input type="date" wire:model.live="startDateTo" id="startDateTo" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border">
+            </div>
+
+            <div class="md:col-span-2 lg:col-span-2 bg-green-50 p-3 rounded-md border border-green-200 text-center flex items-center justify-center h-[62px]">
+                <div>
+                    <span class="block text-xs font-medium text-green-600 uppercase tracking-wider">Total Income</span>
+                    <span class="block text-xl font-bold text-green-700">₱{{ number_format($totalIncome, 2) }}</span>
+                </div>
             </div>
         </div>
     </div>
