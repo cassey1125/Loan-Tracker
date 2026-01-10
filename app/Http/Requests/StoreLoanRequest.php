@@ -24,7 +24,7 @@ class StoreLoanRequest extends FormRequest
         return [
             'borrower_id' => ['required', 'exists:borrowers,id'],
             'amount' => ['required', 'numeric', 'min:1'],
-            'interest_rate' => ['required', 'numeric', 'min:0'],
+            'interest_rate' => ['required', 'numeric', 'in:5,7'],
             'due_date' => ['required', 'date', 'after:today'],
             'payment_term' => ['required', 'integer', 'min:1'],
         ];

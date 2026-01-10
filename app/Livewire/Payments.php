@@ -15,6 +15,7 @@ class Payments extends Component
 
     public $loan_id;
     public $amount;
+    public $payment_method = 'cash';
     public $payment_date;
     public $reference_number;
     public $notes;
@@ -30,8 +31,9 @@ class Payments extends Component
 
         $service->createPayment($validated);
 
-        $this->reset(['loan_id', 'amount', 'reference_number', 'notes']);
+        $this->reset(['loan_id', 'amount', 'reference_number', 'notes', 'payment_method']);
         $this->payment_date = date('Y-m-d');
+        $this->payment_method = 'cash';
 
         session()->flash('message', 'Payment recorded successfully.');
     }

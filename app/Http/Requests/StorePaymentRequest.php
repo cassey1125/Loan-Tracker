@@ -27,6 +27,7 @@ class StorePaymentRequest extends FormRequest
                     }
                 },
             ],
+            'payment_method' => ['required', 'string', 'in:cash,gcash,card'],
             'payment_date' => ['required', 'date'],
             'reference_number' => ['nullable', 'string', 'max:255'],
             'notes' => ['nullable', 'string'],

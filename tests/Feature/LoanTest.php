@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Livewire\Loans;
+use App\Models\Borrower;
 use App\Models\Loan;
 use App\Models\Transaction;
 use App\Models\User;
@@ -17,24 +18,30 @@ class LoanTest extends TestCase
     public function test_can_create_loan_via_livewire_component()
     {
         $user = User::factory()->create();
+        $borrower = Borrower::factory()->create();
 
         Livewire::actingAs($user)
             ->test(Loans::class)
+            ->set('borrower_id', $borrower->id)
             ->set('amount', 1000)
-            ->set('interest_rate', 10)
+            ->set('interest_rate', 5)
             ->set('due_date', now()->addMonth()->format('Y-m-d'))
-            ->set('payment_term', 12)
+            ->set('payment_term', 4) // Reduced term for simpler calc
             ->call('createLoan')
             ->assertHasNoErrors()
             ->assertSee('Loan created successfully');
 
+        // Calc: 1000 * (5/100) * 4 = 200 interest.
+        // Total: 1200.
+
         $this->assertDatabaseHas('loans', [
+            'borrower_id' => $borrower->id,
             'amount' => 1000,
-            'interest_rate' => 10,
-            'payment_term' => 12,
-            'interest_amount' => 100, // 10% of 1000 (Flat Rate Strategy)
-            'total_payable' => 1100,
-            'remaining_balance' => 1100,
+            'interest_rate' => 5,
+            'payment_term' => 4,
+            'interest_amount' => 200, 
+            'total_payable' => 1200,
+            'remaining_balance' => 1200,
             'status' => 'pending',
         ]);
 
