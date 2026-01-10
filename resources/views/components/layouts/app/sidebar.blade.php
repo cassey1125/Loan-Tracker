@@ -36,6 +36,11 @@
                     <span class="material-icons mr-2">history</span>
                     {{ __('Paid / Completed Loans') }}
                 </flux:sidebar.item>
+                <flux:sidebar.item :href="route('investor-profit')" :current="request()->routeIs('investor-profit')"
+                    wire:navigate>
+                    <span class="material-icons mr-2">trending_up</span>
+                    {{ __('Investor Profit') }}
+                </flux:sidebar.item>
                 <flux:sidebar.item :href="route('income_expense')" :current="request()->routeIs('income_expense')"
                     wire:navigate>
                     <span class="material-icons mr-2">bar_chart</span>

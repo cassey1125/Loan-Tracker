@@ -46,6 +46,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('borrowers/{borrower}/edit', function (App\Models\Borrower $borrower) {
         return view('borrowers.edit', compact('borrower'));
     })->name('borrowers.edit');
+
+    Route::get('borrowers/{borrower}/profit', function (App\Models\Borrower $borrower) {
+        return view('borrowers.profit', compact('borrower'));
+    })->name('borrowers.profit');
+
+    Route::get('investor-profit', function () {
+        return view('investor-profit');
+    })->name('investor-profit');
 });
 
 Route::view('loans', 'loans')

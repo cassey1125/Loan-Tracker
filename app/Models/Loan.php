@@ -36,4 +36,16 @@ class Loan extends Model
     {
         return $this->hasMany(Payment::class);
     }
+
+    public function getInvestor1InterestAttribute()
+    {
+        $rate = $this->interest_rate == 7 ? 5 : 4;
+        return $this->amount * ($rate / 100) * $this->payment_term;
+    }
+
+    public function getInvestor2InterestAttribute()
+    {
+        $rate = $this->interest_rate == 7 ? 2 : 1;
+        return $this->amount * ($rate / 100) * $this->payment_term;
+    }
 }

@@ -30,6 +30,10 @@
                     <span class="material-icons mr-2">history</span>
                     {{ __('Paid / Completed Loans History') }}
                 </flux:navbar.item>
+                <flux:navbar.item :href="route('investor-profit')" :current="request()->routeIs('investor-profit')" wire:navigate>
+                    <span class="material-icons mr-2">trending_up</span>
+                    {{ __('Investor Profit') }}
+                </flux:navbar.item>
                 <flux:navbar.item :href="route('income_expense')" :current="request()->routeIs('income_expense')" wire:navigate>
                     <span class="material-icons mr-2">bar_chart</span>
                     {{ __('Income & Expense Tracking') }}
@@ -97,6 +101,10 @@
                     <flux:sidebar.item :href="route('paid_loans')" :current="request()->routeIs('paid_loans')" wire:navigate>
                         <span class="material-icons mr-2">history</span>
                         {{ __('Paid / Completed Loans History') }}
+                    </flux:sidebar.item>
+                    <flux:sidebar.item :href="route('investor-profit')" :current="request()->routeIs('investor-profit')" wire:navigate>
+                        <span class="material-icons mr-2">trending_up</span>
+                        {{ __('Investor Profit') }}
                     </flux:sidebar.item>
                     <flux:sidebar.item :href="route('income_expense')" :current="request()->routeIs('income_expense')" wire:navigate>
                         <span class="material-icons mr-2">bar_chart</span>

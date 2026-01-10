@@ -117,6 +117,7 @@
                                 </span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <a href="{{ route('borrowers.profit', $borrower) }}" class="text-green-600 hover:text-green-900 mr-3">Profit</a>
                                 <a href="{{ route('borrowers.show', $borrower) }}" class="text-indigo-600 hover:text-indigo-900 mr-3">View</a>
                                 <a href="{{ route('borrowers.edit', $borrower) }}" class="text-gray-600 hover:text-gray-900">Edit</a>
                             </td>

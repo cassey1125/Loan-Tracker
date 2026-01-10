@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Borrowers;
 
+use App\Models\Borrower;
 use App\Repositories\BorrowerRepository;
 use Livewire\Component;
 use Livewire\WithPagination;
