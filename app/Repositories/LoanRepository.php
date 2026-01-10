@@ -26,6 +26,29 @@ class LoanRepository
             ->get();
     }
 
+    public function getPaidLoans($search = null, $dateFrom = null, $dateTo = null): Collection
+    {
+        $query = Loan::with('borrower')
+            ->where('status', LoanStatus::PAID);
+
+        if ($search) {
+            $query->whereHas('borrower', function ($q) use ($search) {
+                $q->where('first_name', 'like', '%' . $search . '%')
+                  ->orWhere('last_name', 'like', '%' . $search . '%');
+            });
+        }
+
+        if ($dateFrom) {
+            $query->whereDate('updated_at', '>=', $dateFrom);
+        }
+
+        if ($dateTo) {
+            $query->whereDate('updated_at', '<=', $dateTo);
+        }
+
+        return $query->latest('updated_at')->get();
+    }
+
     public function find(int $id): ?Loan
     {
         return Loan::find($id);
