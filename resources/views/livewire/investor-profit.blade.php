@@ -41,7 +41,9 @@
                                 <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">Loan ID</th>
                                 <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Principal</th>
                                 <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Term</th>
-                                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Interest</th>
+                                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Monthly Profit</th>
+                                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Total Profit</th>
+                                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Total Return</th>
                                 <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-indigo-600">Inv 1 (4%)</th>
                                 <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-green-600">Inv 2 (1%)</th>
                             </tr>
@@ -52,13 +54,20 @@
                                     <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">#{{ $loan->id }}</td>
                                     <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ number_format($loan->amount, 2) }}</td>
                                     <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ $loan->payment_term }} mo</td>
-                                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ number_format($loan->interest_amount, 2) }}</td>
+                                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                        {{ number_format($loan->amount * 0.05, 2) }}
+                                    </td>
+                                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                        {{ number_format($loan->interest_amount, 2) }}
+                                        <span class="text-xs text-gray-400">({{ $loan->payment_term * 5 }}%)</span>
+                                    </td>
+                                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ number_format($loan->total_payable, 2) }}</td>
                                     <td class="whitespace-nowrap px-3 py-4 text-sm font-medium text-indigo-600">{{ number_format($loan->investor1_interest, 2) }}</td>
                                     <td class="whitespace-nowrap px-3 py-4 text-sm font-medium text-green-600">{{ number_format($loan->investor2_interest, 2) }}</td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500">No 5% loans found.</td>
+                                    <td colspan="8" class="px-6 py-4 text-center text-sm text-gray-500">No 5% loans found.</td>
                                 </tr>
                             @endforelse
                         </tbody>
@@ -101,7 +110,9 @@
                                 <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">Loan ID</th>
                                 <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Principal</th>
                                 <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Term</th>
-                                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Interest</th>
+                                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Monthly Profit</th>
+                                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Total Profit</th>
+                                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Total Return</th>
                                 <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-indigo-600">Inv 1 (5%)</th>
                                 <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-green-600">Inv 2 (2%)</th>
                             </tr>
@@ -112,13 +123,20 @@
                                     <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">#{{ $loan->id }}</td>
                                     <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ number_format($loan->amount, 2) }}</td>
                                     <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ $loan->payment_term }} mo</td>
-                                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ number_format($loan->interest_amount, 2) }}</td>
+                                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                        {{ number_format($loan->amount * 0.07, 2) }}
+                                    </td>
+                                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                        {{ number_format($loan->interest_amount, 2) }}
+                                        <span class="text-xs text-gray-400">({{ $loan->payment_term * 7 }}%)</span>
+                                    </td>
+                                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ number_format($loan->total_payable, 2) }}</td>
                                     <td class="whitespace-nowrap px-3 py-4 text-sm font-medium text-indigo-600">{{ number_format($loan->investor1_interest, 2) }}</td>
                                     <td class="whitespace-nowrap px-3 py-4 text-sm font-medium text-green-600">{{ number_format($loan->investor2_interest, 2) }}</td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500">No 7% loans found.</td>
+                                    <td colspan="8" class="px-6 py-4 text-center text-sm text-gray-500">No 7% loans found.</td>
                                 </tr>
                             @endforelse
                         </tbody>

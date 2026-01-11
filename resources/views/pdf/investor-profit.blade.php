@@ -77,7 +77,9 @@
                 <th>Loan ID</th>
                 <th>Principal</th>
                 <th>Term</th>
-                <th>Interest</th>
+                <th>Monthly Profit</th>
+                <th>Total Profit</th>
+                <th>Total Return</th>
                 <th>Inv 1 (4%)</th>
                 <th>Inv 2 (1%)</th>
             </tr>
@@ -88,13 +90,15 @@
                     <td>#{{ $loan->id }}</td>
                     <td>{{ number_format($loan->amount, 2) }}</td>
                     <td>{{ $loan->payment_term }} mo</td>
-                    <td>{{ number_format($loan->interest_amount, 2) }}</td>
+                    <td>{{ number_format($loan->amount * 0.05, 2) }}</td>
+                    <td>{{ number_format($loan->interest_amount, 2) }} ({{ $loan->payment_term * 5 }}%)</td>
+                    <td>{{ number_format($loan->total_payable, 2) }}</td>
                     <td class="text-indigo">{{ number_format($loan->investor1_interest, 2) }}</td>
                     <td class="text-green">{{ number_format($loan->investor2_interest, 2) }}</td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="6" class="text-center">No 5% loans found.</td>
+                    <td colspan="8" class="text-center">No 5% loans found.</td>
                 </tr>
             @endforelse
         </tbody>
@@ -116,7 +120,9 @@
                 <th>Loan ID</th>
                 <th>Principal</th>
                 <th>Term</th>
-                <th>Interest</th>
+                <th>Monthly Profit</th>
+                <th>Total Profit</th>
+                <th>Total Return</th>
                 <th>Inv 1 (5%)</th>
                 <th>Inv 2 (2%)</th>
             </tr>
@@ -127,13 +133,15 @@
                     <td>#{{ $loan->id }}</td>
                     <td>{{ number_format($loan->amount, 2) }}</td>
                     <td>{{ $loan->payment_term }} mo</td>
-                    <td>{{ number_format($loan->interest_amount, 2) }}</td>
+                    <td>{{ number_format($loan->amount * 0.07, 2) }}</td>
+                    <td>{{ number_format($loan->interest_amount, 2) }} ({{ $loan->payment_term * 7 }}%)</td>
+                    <td>{{ number_format($loan->total_payable, 2) }}</td>
                     <td class="text-indigo">{{ number_format($loan->investor1_interest, 2) }}</td>
                     <td class="text-green">{{ number_format($loan->investor2_interest, 2) }}</td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="6" class="text-center">No 7% loans found.</td>
+                    <td colspan="8" class="text-center">No 7% loans found.</td>
                 </tr>
             @endforelse
         </tbody>
