@@ -25,6 +25,10 @@ class Dashboard extends Component
         $loans = Loan::all();
         $totalLent = $loans->sum('amount');
         
+        $totalExpected = Loan::sum('total_payable');
+        $totalRemaining = Loan::sum('remaining_balance');
+        $totalCollected = $totalExpected - $totalRemaining;
+        
         $paidLoansAmount = Loan::where('status', LoanStatus::PAID)->sum('total_payable');
         $notYetPaidAmount = Loan::where('status', '!=', LoanStatus::PAID)->sum('remaining_balance');
         
@@ -105,6 +109,8 @@ class Dashboard extends Component
         return view('livewire.dashboard', [
             'investors' => Investor::all(), // Kept for other potential uses if any, or can be removed
             'totalLent' => $totalLent,
+            'totalCollected' => $totalCollected,
+            'totalExpected' => $totalExpected,
             'notYetPaidAmount' => $notYetPaidAmount,
             'earningsJo' => $earningsJo,
             'earningsRob' => $earningsRob,

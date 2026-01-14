@@ -8,8 +8,8 @@
                     <!-- Placeholder for Donut Chart -->
                     <div class="absolute inset-0 flex items-center justify-center flex-col">
                         <span class="text-3xl font-bold text-indigo-600">
-                            @if(($notYetPaidAmount + $totalLent) > 0)
-                                {{ number_format(($totalLent / ($notYetPaidAmount + $totalLent)) * 100, 1) }}%
+                            @if($totalExpected > 0)
+                                {{ number_format(($totalCollected / $totalExpected) * 100, 1) }}%
                             @else
                                 0%
                             @endif
@@ -18,7 +18,7 @@
                     </div>
                     <svg class="w-full h-full transform -rotate-90">
                         <circle cx="64" cy="64" r="56" stroke="#e5e7eb" stroke-width="12" fill="none" />
-                        <circle cx="64" cy="64" r="56" stroke="#4f46e5" stroke-width="12" fill="none" stroke-dasharray="351" stroke-dashoffset="{{ 351 - (351 * (($totalLent / max(($notYetPaidAmount + $totalLent), 1)) * 100) / 100) }}" />
+                        <circle cx="64" cy="64" r="56" stroke="#4f46e5" stroke-width="12" fill="none" stroke-dasharray="351" stroke-dashoffset="{{ 351 - (351 * ($totalExpected > 0 ? ($totalCollected / $totalExpected) : 0)) }}" />
                     </svg>
                 </div>
             </div>
