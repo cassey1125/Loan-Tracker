@@ -1,6 +1,6 @@
 <div class="space-y-6">
     <!-- Payment Form -->
-    <div class="bg-white p-6 rounded-lg shadow-md">
+    <div class="bg-white shadow px-4 py-5 sm:rounded-lg sm:p-6">
         <h2 class="text-xl font-semibold mb-4 text-gray-800">Record New Payment</h2>
         
         @if (session()->has('message'))

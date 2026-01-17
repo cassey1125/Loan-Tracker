@@ -2,7 +2,7 @@
     <!-- Top Stats / Lending Dashboard -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <!-- Loan Progress Donut (Simplified as Card for now, can be Chart) -->
-        <div class="bg-white p-6 rounded-lg shadow-md flex items-center justify-center">
+        <div class="bg-white shadow px-4 py-5 sm:rounded-lg sm:p-6 flex items-center justify-center">
             <div class="text-center">
                 <div class="relative w-32 h-32 mx-auto">
                     <!-- Placeholder for Donut Chart -->
@@ -25,7 +25,7 @@
         </div>
 
         <!-- Summary Stats -->
-        <div class="bg-white p-6 rounded-lg shadow-md flex flex-col justify-center space-y-4">
+        <div class="bg-white shadow px-4 py-5 sm:rounded-lg sm:p-6 flex flex-col justify-center space-y-4">
             <div>
                 <span class="text-sm text-gray-500">Not Yet Paid</span>
                 <div class="text-2xl font-bold text-red-600">₱{{ number_format($notYetPaidAmount, 2) }}</div>
@@ -37,7 +37,7 @@
         </div>
 
         <!-- Investor Earnings -->
-        <div class="bg-white p-6 rounded-lg shadow-md flex flex-col justify-center space-y-4">
+        <div class="bg-white shadow px-4 py-5 sm:rounded-lg sm:p-6 flex flex-col justify-center space-y-4">
             <div>
                 <span class="text-sm text-gray-500">Earnings of Jo</span>
                 <div class="text-xl font-bold text-blue-600">₱{{ number_format($earningsJo, 2) }}</div>
@@ -49,7 +49,7 @@
         </div>
 
         <!-- Funds Management -->
-        <div class="bg-white p-6 rounded-lg shadow-md flex flex-col justify-center space-y-4">
+        <div class="bg-white shadow px-4 py-5 sm:rounded-lg sm:p-6 flex flex-col justify-center space-y-4">
             <div>
                 <span class="text-sm text-gray-500">Total Funds</span>
                 <div class="text-2xl font-bold text-gray-900 break-all">₱{{ number_format($totalInvestorFunds, 2) }}</div>
@@ -60,13 +60,13 @@
     <!-- Charts Row -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Loan Status Pie Chart -->
-        <div class="bg-white p-6 rounded-lg shadow-md">
+        <div class="bg-white shadow px-4 py-5 sm:rounded-lg sm:p-6">
             <h3 class="text-lg font-medium text-gray-900 mb-4">Loaner Status</h3>
             <div id="loanStatusChart" class="h-64" data-chart="{{ json_encode($pieChartData) }}"></div>
         </div>
 
         <!-- Statistics Line Chart -->
-        <div class="bg-white p-6 rounded-lg shadow-md lg:col-span-2">
+        <div class="bg-white shadow px-4 py-5 sm:rounded-lg sm:p-6 lg:col-span-2">
             <h3 class="text-lg font-medium text-gray-900 mb-4">Lending Insights</h3>
             <div id="lendingInsightsChart" class="h-64" data-chart="{{ json_encode($lineChartData) }}"></div>
         </div>
