@@ -10,10 +10,7 @@ class BorrowerCreate extends Component
 {
     public $first_name;
     public $last_name;
-    public $email;
     public $phone;
-    public $address;
-    public $identification_number;
 
     public function save(BorrowerService $service)
     {

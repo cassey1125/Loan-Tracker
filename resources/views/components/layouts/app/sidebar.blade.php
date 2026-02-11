@@ -16,42 +16,60 @@
         <flux:sidebar.nav>
             <flux:sidebar.group :heading="__('Platform')" class="grid">
                 <flux:sidebar.item :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>
-                    <span class="material-icons mr-2">dashboard</span>
+                    <x-slot:icon>
+                        <span class="material-icons">dashboard</span>
+                    </x-slot:icon>
                     {{ __('Dashboard') }}
                 </flux:sidebar.item>
                 <flux:sidebar.item :href="route('borrowers.index')" :current="request()->routeIs('borrowers.*')" wire:navigate>
-                    <span class="material-icons mr-2">group</span>
+                    <x-slot:icon>
+                        <span class="material-icons">group</span>
+                    </x-slot:icon>
                     {{ __('Borrower List') }}
                 </flux:sidebar.item>
                 <flux:sidebar.item :href="route('loans')" :current="request()->routeIs('loans')" wire:navigate>
-                    <span class="material-icons mr-2">account_balance</span>
+                    <x-slot:icon>
+                        <span class="material-icons">account_balance</span>
+                    </x-slot:icon>
                     {{ __('Loan Management') }}
                 </flux:sidebar.item>
                 <flux:sidebar.item :href="route('payments')" :current="request()->routeIs('payments')" wire:navigate>
-                    <span class="material-icons mr-2">payment</span>
+                    <x-slot:icon>
+                        <span class="material-icons">payment</span>
+                    </x-slot:icon>
                     {{ __('Payment Management') }}
                 </flux:sidebar.item>
                 <flux:sidebar.item :href="route('funds')" :current="request()->routeIs('funds')" wire:navigate>
-                    <span class="material-icons mr-2">account_balance_wallet</span>
+                    <x-slot:icon>
+                        <span class="material-icons">account_balance_wallet</span>
+                    </x-slot:icon>
                     {{ __('Funds') }}
                 </flux:sidebar.item>
                 <flux:sidebar.item :href="route('paid_loans')" :current="request()->routeIs('paid_loans')"
                     wire:navigate>
-                    <span class="material-icons mr-2">history</span>
+                    <x-slot:icon>
+                        <span class="material-icons">history</span>
+                    </x-slot:icon>
                     {{ __('Paid / Completed Loans') }}
                 </flux:sidebar.item>
                 <flux:sidebar.item :href="route('investor-profit')" :current="request()->routeIs('investor-profit')"
                     wire:navigate>
-                    <span class="material-icons mr-2">trending_up</span>
+                    <x-slot:icon>
+                        <span class="material-icons">trending_up</span>
+                    </x-slot:icon>
                     {{ __('Investor Profit') }}
                 </flux:sidebar.item>
                 <flux:sidebar.item :href="route('income_expense')" :current="request()->routeIs('income_expense')"
                     wire:navigate>
-                    <span class="material-icons mr-2">bar_chart</span>
+                    <x-slot:icon>
+                        <span class="material-icons">bar_chart</span>
+                    </x-slot:icon>
                     {{ __('Income & Expense Tracking') }}
                 </flux:sidebar.item>
                 <flux:sidebar.item :href="route('reports')" :current="request()->routeIs('reports')" wire:navigate>
-                    <span class="material-icons mr-2">assessment</span>
+                    <x-slot:icon>
+                        <span class="material-icons">assessment</span>
+                    </x-slot:icon>
                     {{ __('Reports & Search Filters') }}
                 </flux:sidebar.item>
             </flux:sidebar.group>

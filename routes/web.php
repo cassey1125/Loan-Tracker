@@ -2,14 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 
-// --- MAINTENANCE MODE ---
-// All routes are currently redirected to maintenance mode
-Route::any('{any?}', function () {
-    return view('maintenance');
-})->where('any', '.*');
 
-// --- ORIGINAL ROUTES (COMMENTED OUT) ---
-/*
 use App\Livewire\Borrowers\BorrowerCreate;
 use App\Livewire\Borrowers\BorrowerEdit;
 use App\Livewire\Borrowers\BorrowerList;
@@ -94,4 +87,3 @@ Route::view('reports', 'reports')
     ->name('reports');
 
 require __DIR__.'/settings.php';
-*/

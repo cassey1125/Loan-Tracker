@@ -7,16 +7,8 @@
             </h2>
             <div class="mt-1 flex flex-col sm:flex-row sm:flex-wrap sm:mt-0 sm:space-x-6">
                 <div class="mt-2 flex items-center text-sm text-gray-500">
-                    <span class="material-icons text-gray-400 mr-1.5 text-lg">email</span>
-                    {{ $borrower->email }}
-                </div>
-                <div class="mt-2 flex items-center text-sm text-gray-500">
                     <span class="material-icons text-gray-400 mr-1.5 text-lg">phone</span>
                     {{ $borrower->phone }}
-                </div>
-                <div class="mt-2 flex items-center text-sm text-gray-500">
-                    <span class="material-icons text-gray-400 mr-1.5 text-lg">badge</span>
-                    ID: {{ $borrower->identification_number }}
                 </div>
             </div>
         </div>
@@ -52,34 +44,10 @@
                 </div>
                 <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                     <dt class="text-sm font-medium text-gray-500">
-                        Email address
-                    </dt>
-                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                        {{ $borrower->email }}
-                    </dd>
-                </div>
-                <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                    <dt class="text-sm font-medium text-gray-500">
                         Phone number
                     </dt>
                     <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
                         {{ $borrower->phone }}
-                    </dd>
-                </div>
-                <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                    <dt class="text-sm font-medium text-gray-500">
-                        Identification Number
-                    </dt>
-                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                        {{ $borrower->identification_number }}
-                    </dd>
-                </div>
-                <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                    <dt class="text-sm font-medium text-gray-500">
-                        Address
-                    </dt>
-                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                        {{ $borrower->address }}
                     </dd>
                 </div>
             </dl>

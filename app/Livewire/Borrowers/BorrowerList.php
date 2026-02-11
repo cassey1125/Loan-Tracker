@@ -4,6 +4,7 @@ namespace App\Livewire\Borrowers;
 
 use App\Models\Borrower;
 use App\Repositories\BorrowerRepository;
+use App\Services\Borrower\BorrowerService;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -22,6 +23,14 @@ class BorrowerList extends Component
         'sortBy' => ['except' => 'name'],
         'sortDirection' => ['except' => 'asc'],
     ];
+
+    public function delete(BorrowerService $service, $id)
+    {
+        $borrower = Borrower::findOrFail($id);
+        $service->deleteBorrower($borrower);
+        
+        session()->flash('message', 'Borrower deleted successfully.');
+    }
 
     public function updatingSearch()
     {
