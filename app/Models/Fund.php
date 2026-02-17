@@ -14,9 +14,16 @@ class Fund extends Model
         'amount',
         'type',
         'description',
+        'reference_id',
+        'reference_type',
     ];
 
     protected $casts = [
         'date' => 'date',
     ];
+
+    public function reference()
+    {
+        return $this->morphTo();
+    }
 }

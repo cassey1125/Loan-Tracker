@@ -53,6 +53,19 @@ class PaymentService
             ]);
         }
 
+        // 5. Update related Fund entry
+        $fund = \App\Models\Fund::where('reference_type', Payment::class)
+            ->where('reference_id', $payment->id)
+            ->first();
+            
+        if ($fund) {
+            $fund->update([
+                'amount' => $payment->amount,
+                'date' => $payment->payment_date ?? now(),
+                'description' => "Payment for Loan #{$newLoan->id} - Ref: " . ($payment->reference_number ?? 'N/A'),
+            ]);
+        }
+
         return $payment;
     }
 }
