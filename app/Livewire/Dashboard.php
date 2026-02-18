@@ -98,10 +98,9 @@ class Dashboard extends Component
             $lent = Loan::whereBetween('created_at', [$startOfMonth, $endOfMonth])->sum('amount');
             $lentData[] = $lent;
             
-            // Cash In (Payments) - Need Payment model for accuracy, but using Transaction is better if available
-            // Let's use Transaction model which tracks income
-            $cashIn = \App\Models\Transaction::where('type', 'income')
-                ->whereBetween('created_at', [$startOfMonth, $endOfMonth])
+            // Cash In (Funds Deposits) - Use Fund model to track deposits
+            $cashIn = Fund::where('type', 'deposit')
+                ->whereBetween('date', [$startOfMonth, $endOfMonth])
                 ->sum('amount');
             $cashInData[] = $cashIn;
         }
