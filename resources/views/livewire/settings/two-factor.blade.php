@@ -3,7 +3,7 @@
 
     <flux:heading class="sr-only">{{ __('Two-Factor Authentication Settings') }}</flux:heading>
 
-    <x-settings.layout
+    <x-settings.wrapper
         :heading="__('Two Factor Authentication')"
         :subheading="__('Manage your two-factor authentication settings')"
     >
@@ -52,7 +52,7 @@
                 </div>
             @endif
         </div>
-    </x-settings.layout>
+    </x-settings.wrapper>
 
     <flux:modal
         name="two-factor-setup-modal"
