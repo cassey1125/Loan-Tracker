@@ -2,9 +2,19 @@ import ApexCharts from 'apexcharts';
 
 (() => {
     if (window.__dashboardChartsBooted) {
+        if (window.__dashboardChartsDebug) {
+            console.log('[dashboard-charts] boot skipped (already initialized)');
+        }
         return;
     }
     window.__dashboardChartsBooted = true;
+
+    const log = (...args) => {
+        if (!window.__dashboardChartsDebug) {
+            return;
+        }
+        console.log('[dashboard-charts]', ...args);
+    };
 
     const state = {
         pieChart: null,
@@ -19,6 +29,7 @@ import ApexCharts from 'apexcharts';
         }
 
         try {
+            log('destroy', chartKey);
             chart.destroy();
         } catch (e) {
             console.error('Error destroying chart:', e);
@@ -30,6 +41,11 @@ import ApexCharts from 'apexcharts';
     const initCharts = () => {
         const pieChartEl = document.querySelector('#loanStatusChart');
         const lineChartEl = document.querySelector('#lendingInsightsChart');
+
+        log('init start', {
+            pieExists: Boolean(pieChartEl),
+            lineExists: Boolean(lineChartEl),
+        });
 
         if (!pieChartEl) {
             destroyChart('pieChart');
@@ -62,6 +78,7 @@ import ApexCharts from 'apexcharts';
 
                 state.pieChart = new ApexCharts(pieChartEl, pieOptions);
                 state.pieChart.render();
+                log('render pie', pieOptions.series);
             } catch (e) {
                 console.error('Error initializing Pie Chart:', e);
             }
@@ -92,6 +109,10 @@ import ApexCharts from 'apexcharts';
 
                 state.lineChart = new ApexCharts(lineChartEl, lineOptions);
                 state.lineChart.render();
+                log('render line', {
+                    categories: lineOptions.xaxis.categories,
+                    series: lineOptions.series,
+                });
             } catch (e) {
                 console.error('Error initializing Line Chart:', e);
             }
@@ -100,10 +121,12 @@ import ApexCharts from 'apexcharts';
 
     const queueInitCharts = () => {
         if (state.initQueued) {
+            log('queue skipped (already queued)');
             return;
         }
 
         state.initQueued = true;
+        log('queue init');
 
         requestAnimationFrame(() => {
             state.initQueued = false;
@@ -116,6 +139,7 @@ import ApexCharts from 'apexcharts';
 
     document.addEventListener('livewire:initialized', () => {
         if (typeof Livewire !== 'undefined' && typeof Livewire.on === 'function') {
+            log('register Livewire event: dashboard-refresh-charts');
             Livewire.on('dashboard-refresh-charts', queueInitCharts);
         }
     });
