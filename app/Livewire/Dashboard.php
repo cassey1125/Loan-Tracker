@@ -16,6 +16,7 @@ class Dashboard extends Component
 {
     public $chartData = [];
     public $insightsCleared = false;
+    public $insightsChartVersion = 0;
 
     public function mount()
     {
@@ -24,11 +25,15 @@ class Dashboard extends Component
     public function clearLendingInsights(): void
     {
         $this->insightsCleared = true;
+        $this->insightsChartVersion++;
+        $this->dispatch('dashboard-refresh-charts');
     }
 
     public function resetLendingInsights(): void
     {
         $this->insightsCleared = false;
+        $this->insightsChartVersion++;
+        $this->dispatch('dashboard-refresh-charts');
     }
 
     public function render()

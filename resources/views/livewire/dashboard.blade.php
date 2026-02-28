@@ -92,7 +92,12 @@
                     Lending insights cleared. Click Reset to load data again.
                 </div>
             @else
-                <div id="lendingInsightsChart" class="h-64" data-chart="{{ json_encode($lineChartData) }}"></div>
+                <div
+                    wire:key="lending-insights-chart-{{ $insightsChartVersion }}"
+                    id="lendingInsightsChart"
+                    class="h-64"
+                    data-chart="{{ json_encode($lineChartData) }}"
+                ></div>
             @endif
         </div>
     </div>

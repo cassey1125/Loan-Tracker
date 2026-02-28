@@ -2,9 +2,14 @@ const initCharts = () => {
     const pieChartEl = document.querySelector("#loanStatusChart");
     const lineChartEl = document.querySelector("#lendingInsightsChart");
 
-    if (pieChartEl && !pieChartEl.chart) {
+    if (pieChartEl) {
         try {
             const pieData = JSON.parse(pieChartEl.getAttribute('data-chart'));
+
+            if (pieChartEl.chart) {
+                pieChartEl.chart.destroy();
+                pieChartEl.chart = null;
+            }
             
             const pieOptions = {
                 series: pieData.data,
@@ -26,9 +31,14 @@ const initCharts = () => {
         }
     }
 
-    if (lineChartEl && !lineChartEl.chart) {
+    if (lineChartEl) {
         try {
             const lineData = JSON.parse(lineChartEl.getAttribute('data-chart'));
+
+            if (lineChartEl.chart) {
+                lineChartEl.chart.destroy();
+                lineChartEl.chart = null;
+            }
             
             const lineOptions = {
                 series: lineData.series,
@@ -55,3 +65,8 @@ const initCharts = () => {
 
 document.addEventListener('livewire:initialized', initCharts);
 document.addEventListener('livewire:navigated', initCharts);
+document.addEventListener('livewire:initialized', () => {
+    if (typeof Livewire !== 'undefined' && typeof Livewire.on === 'function') {
+        Livewire.on('dashboard-refresh-charts', () => requestAnimationFrame(initCharts));
+    }
+});
