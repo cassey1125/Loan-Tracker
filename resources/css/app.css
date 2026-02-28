@@ -61,6 +61,61 @@ select:focus[data-flux-control] {
     @apply outline-hidden ring-2 ring-accent ring-offset-2 ring-offset-accent-foreground;
 }
 
+/* Sidebar polish */
+.app-sidebar {
+    width: 280px;
+    padding: 14px 12px;
+    background: linear-gradient(180deg, #f8fafc 0%, #f3f4f6 100%);
+}
+
+.app-sidebar-nav {
+    margin-top: 6px;
+}
+
+.app-sidebar-group {
+    gap: 4px;
+}
+
+.app-sidebar-item {
+    min-height: 42px;
+    border-radius: 10px;
+    padding: 9px 10px;
+    font-size: 15px;
+    font-weight: 500;
+    color: #334155;
+    transition: background-color 0.18s ease, color 0.18s ease, transform 0.18s ease;
+}
+
+.app-sidebar-item:hover {
+    background: #e2e8f0;
+    color: #0f172a;
+}
+
+.app-sidebar-item[aria-current="page"],
+.app-sidebar-item[data-current="true"],
+.app-sidebar-item.is-current {
+    background: #dbeafe;
+    color: #1d4ed8;
+    font-weight: 600;
+}
+
+.app-sidebar-icon {
+    font-size: 20px !important;
+    width: 20px;
+    height: 20px;
+    line-height: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: inherit;
+}
+
+@media (max-width: 1024px) {
+    .app-sidebar {
+        width: 100%;
+    }
+}
+
 /* \[:where(&)\]:size-4 {
     @apply size-4;
 } */

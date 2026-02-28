@@ -7,75 +7,75 @@
 
 <body class="min-h-screen bg-white dark:bg-zinc-800 lg:flex">
     <flux:sidebar sticky collapsible="mobile"
-        class="border-e border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
+        class="app-sidebar border-e border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
         <flux:sidebar.header>
             <x-app-logo :sidebar="true" href="{{ route('dashboard') }}" wire:navigate />
             <flux:sidebar.collapse class="lg:hidden" />
         </flux:sidebar.header>
 
-        <flux:sidebar.nav>
-            <flux:sidebar.group :heading="__('Platform')" class="grid">
-                <flux:sidebar.item :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>
+        <flux:sidebar.nav class="app-sidebar-nav">
+            <flux:sidebar.group :heading="__('Platform')" class="app-sidebar-group grid">
+                <flux:sidebar.item :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate class="app-sidebar-item">
                     <x-slot:icon>
-                        <span class="material-icons">dashboard</span>
+                        <span class="material-icons app-sidebar-icon">dashboard</span>
                     </x-slot:icon>
                     {{ __('Dashboard') }}
                 </flux:sidebar.item>
-                <flux:sidebar.item :href="route('borrowers.index')" :current="request()->routeIs('borrowers.*')" wire:navigate>
+                <flux:sidebar.item :href="route('borrowers.index')" :current="request()->routeIs('borrowers.*')" wire:navigate class="app-sidebar-item">
                     <x-slot:icon>
-                        <span class="material-icons">group</span>
+                        <span class="material-icons app-sidebar-icon">group</span>
                     </x-slot:icon>
                     {{ __('Borrower List') }}
                 </flux:sidebar.item>
-                <flux:sidebar.item :href="route('loans')" :current="request()->routeIs('loans')" wire:navigate>
+                <flux:sidebar.item :href="route('loans')" :current="request()->routeIs('loans')" wire:navigate class="app-sidebar-item">
                     <x-slot:icon>
-                        <span class="material-icons">account_balance</span>
+                        <span class="material-icons app-sidebar-icon">account_balance</span>
                     </x-slot:icon>
                     {{ __('Loan Management') }}
                 </flux:sidebar.item>
-                <flux:sidebar.item :href="route('payments')" :current="request()->routeIs('payments')" wire:navigate>
+                <flux:sidebar.item :href="route('payments')" :current="request()->routeIs('payments')" wire:navigate class="app-sidebar-item">
                     <x-slot:icon>
-                        <span class="material-icons">payment</span>
+                        <span class="material-icons app-sidebar-icon">payment</span>
                     </x-slot:icon>
                     {{ __('Payment Management') }}
                 </flux:sidebar.item>
-                <flux:sidebar.item :href="route('funds')" :current="request()->routeIs('funds')" wire:navigate>
+                <flux:sidebar.item :href="route('funds')" :current="request()->routeIs('funds')" wire:navigate class="app-sidebar-item">
                     <x-slot:icon>
-                        <span class="material-icons">account_balance_wallet</span>
+                        <span class="material-icons app-sidebar-icon">account_balance_wallet</span>
                     </x-slot:icon>
                     {{ __('Funds') }}
                 </flux:sidebar.item>
                 <flux:sidebar.item :href="route('paid_loans')" :current="request()->routeIs('paid_loans')"
-                    wire:navigate>
+                    wire:navigate class="app-sidebar-item">
                     <x-slot:icon>
-                        <span class="material-icons">history</span>
+                        <span class="material-icons app-sidebar-icon">history</span>
                     </x-slot:icon>
                     {{ __('Paid / Completed Loans') }}
                 </flux:sidebar.item>
                 <flux:sidebar.item :href="route('investor-profit')" :current="request()->routeIs('investor-profit')"
-                    wire:navigate>
+                    wire:navigate class="app-sidebar-item">
                     <x-slot:icon>
-                        <span class="material-icons">trending_up</span>
+                        <span class="material-icons app-sidebar-icon">trending_up</span>
                     </x-slot:icon>
                     {{ __('Investor Profit') }}
                 </flux:sidebar.item>
                 <flux:sidebar.item :href="route('income_expense')" :current="request()->routeIs('income_expense')"
-                    wire:navigate>
+                    wire:navigate class="app-sidebar-item">
                     <x-slot:icon>
-                        <span class="material-icons">bar_chart</span>
+                        <span class="material-icons app-sidebar-icon">bar_chart</span>
                     </x-slot:icon>
                     {{ __('Income & Expense Tracking') }}
                 </flux:sidebar.item>
-                <flux:sidebar.item :href="route('reports')" :current="request()->routeIs('reports')" wire:navigate>
+                <flux:sidebar.item :href="route('reports')" :current="request()->routeIs('reports')" wire:navigate class="app-sidebar-item">
                     <x-slot:icon>
-                        <span class="material-icons">assessment</span>
+                        <span class="material-icons app-sidebar-icon">assessment</span>
                     </x-slot:icon>
                     {{ __('Reports & Search Filters') }}
                 </flux:sidebar.item>
                 <flux:sidebar.item :href="route('motor_rentals')" :current="request()->routeIs('motor_rentals')"
-                    wire:navigate>
+                    wire:navigate class="app-sidebar-item">
                     <x-slot:icon>
-                        <span class="material-icons">two_wheeler</span>
+                        <span class="material-icons app-sidebar-icon">two_wheeler</span>
                     </x-slot:icon>
                     {{ __('Motor Rentals') }}
                 </flux:sidebar.item>
