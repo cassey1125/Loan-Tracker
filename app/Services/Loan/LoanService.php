@@ -22,8 +22,8 @@ class LoanService
         $rate = (float) $data['interest_rate'];
         $term = (int) $data['payment_term'];
 
-        $interest = $this->interestStrategy->calculate($amount, $rate, $term);
-        $totalPayable = $amount + $interest;
+        $interest = round($this->interestStrategy->calculate($amount, $rate, $term), 2);
+        $totalPayable = round($amount + $interest, 2);
 
         $loanData = array_merge($data, [
             'interest_amount' => $interest,
@@ -44,18 +44,18 @@ class LoanService
         $term = (int) $data['payment_term'];
 
         // Recalculate financial details
-        $interest = $this->interestStrategy->calculate($amount, $rate, $term);
-        $totalPayable = $amount + $interest;
+        $interest = round($this->interestStrategy->calculate($amount, $rate, $term), 2);
+        $totalPayable = round($amount + $interest, 2);
         
         // Calculate how much has been paid so far
-        $paidAmount = $loan->total_payable - $loan->remaining_balance;
+        $paidAmount = round((float) $loan->total_payable - (float) $loan->remaining_balance, 2);
         
         // New remaining balance
-        $remainingBalance = $totalPayable - $paidAmount;
+        $remainingBalance = round($totalPayable - $paidAmount, 2);
         
         // Prevent negative balance if new total is less than paid amount (optional safety)
         if ($remainingBalance < 0) {
-            $remainingBalance = 0; 
+            $remainingBalance = 0;
             // Ideally we might want to warn or handle this, but for now we clamp to 0
         }
 

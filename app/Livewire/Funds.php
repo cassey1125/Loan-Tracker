@@ -30,6 +30,14 @@ class Funds extends Component
             'date' => 'required|date',
         ]);
 
+        if ($validated['transactionType'] === 'withdrawal') {
+            $availableBalance = $this->availableFundBalanceForValidation();
+            if ((float) $validated['amount'] > $availableBalance) {
+                $this->addError('amount', 'Withdrawal exceeds available funds of ' . number_format($availableBalance, 2) . '.');
+                return;
+            }
+        }
+
         $payload = [
             'amount' => $validated['amount'],
             'type' => $validated['transactionType'],
@@ -53,6 +61,10 @@ class Funds extends Component
     public function editFund(int $id): void
     {
         $fund = Fund::findOrFail($id);
+        if ($this->isSystemGeneratedFund($fund)) {
+            session()->flash('message', 'System-generated fund entries from loans/payments cannot be edited.');
+            return;
+        }
 
         $this->editingFundId = $fund->id;
         $this->amount = $fund->amount;
@@ -69,6 +81,10 @@ class Funds extends Component
     public function deleteFund(int $id): void
     {
         $fund = Fund::findOrFail($id);
+        if ($this->isSystemGeneratedFund($fund)) {
+            session()->flash('message', 'System-generated fund entries from loans/payments cannot be deleted.');
+            return;
+        }
         $fund->delete();
 
         if ($this->editingFundId === $id) {
@@ -86,6 +102,35 @@ class Funds extends Component
         $this->transactionType = 'deposit';
         $this->description = null;
         $this->date = date('Y-m-d');
+    }
+
+    private function isSystemGeneratedFund(Fund $fund): bool
+    {
+        return !empty($fund->reference_type) && !empty($fund->reference_id);
+    }
+
+    private function availableFundBalanceForValidation(): float
+    {
+        $deposits = (float) Fund::where('type', 'deposit')->sum('amount');
+        $withdrawals = (float) Fund::where('type', 'withdrawal')->sum('amount');
+        $available = $deposits - $withdrawals;
+
+        if (!$this->editingFundId) {
+            return max(0, round($available, 2));
+        }
+
+        $current = Fund::find($this->editingFundId);
+        if (!$current) {
+            return max(0, round($available, 2));
+        }
+
+        if ($current->type === 'deposit') {
+            $available -= (float) $current->amount;
+        } else {
+            $available += (float) $current->amount;
+        }
+
+        return max(0, round($available, 2));
     }
 
     public function render()

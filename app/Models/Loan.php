@@ -29,6 +29,11 @@ class Loan extends Model
     ];
 
     protected $casts = [
+        'amount' => 'decimal:2',
+        'interest_rate' => 'decimal:2',
+        'interest_amount' => 'decimal:2',
+        'total_payable' => 'decimal:2',
+        'remaining_balance' => 'decimal:2',
         'due_date' => 'date',
         'status' => LoanStatus::class,
     ];

@@ -38,9 +38,38 @@ class LoanObserver
      */
     public function updating(Loan $loan): void
     {
-        // Auto update status to paid when balance is 0
-        if ($loan->isDirty('remaining_balance') && $loan->remaining_balance <= 0) {
-            $loan->status = \App\Enums\LoanStatus::PAID;
+        if ($loan->isDirty('remaining_balance')) {
+            if ($loan->remaining_balance <= 0) {
+                $loan->status = \App\Enums\LoanStatus::PAID;
+            } else {
+                $loan->status = $loan->due_date && $loan->due_date->isPast()
+                    ? \App\Enums\LoanStatus::OVERDUE
+                    : \App\Enums\LoanStatus::PENDING;
+            }
         }
+    }
+
+    /**
+     * Handle the Loan "updated" event.
+     */
+    public function updated(Loan $loan): void
+    {
+        if (!$loan->wasChanged('amount')) {
+            return;
+        }
+
+        Transaction::where('reference_type', Loan::class)
+            ->where('reference_id', $loan->id)
+            ->update([
+                'amount' => $loan->amount,
+                'description' => "Loan release for Loan #{$loan->id}",
+            ]);
+
+        Fund::where('reference_type', Loan::class)
+            ->where('reference_id', $loan->id)
+            ->update([
+                'amount' => $loan->amount,
+                'description' => "Loan release for Loan #{$loan->id}",
+            ]);
     }
 }

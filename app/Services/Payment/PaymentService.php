@@ -2,8 +2,12 @@
 
 namespace App\Services\Payment;
 
+use App\Models\Loan;
 use App\Models\Payment;
+use App\Models\Transaction;
+use App\Models\Fund;
 use App\Repositories\PaymentRepository;
+use Illuminate\Support\Facades\DB;
 
 class PaymentService
 {
@@ -16,56 +20,55 @@ class PaymentService
 
     public function updatePayment(Payment $payment, array $data): Payment
     {
-        // 1. Revert effect of old payment on the old loan
-        $oldLoan = $payment->loan;
-        if ($oldLoan) {
-            $oldLoan->remaining_balance += $payment->amount;
-            $oldLoan->save();
-        }
-
-        // 2. Update payment details
-        $payment->fill($data);
-        $payment->save();
-
-        // 3. Apply effect of new payment on the new loan
-        $newLoan = $payment->loan; // Relationship should reflect new loan_id
-        if (!$newLoan) {
-             $newLoan = \App\Models\Loan::find($data['loan_id']);
-        }
-        
-        if ($newLoan) {
-            $newLoan->remaining_balance -= $payment->amount;
-            if ($newLoan->remaining_balance < 0) {
-                $newLoan->remaining_balance = 0;
+        return DB::transaction(function () use ($payment, $data) {
+            // 1. Revert effect of old payment on the old loan
+            $oldLoan = $payment->loan;
+            if ($oldLoan) {
+                $oldLoan->remaining_balance = round((float) $oldLoan->remaining_balance + (float) $payment->amount, 2);
+                $oldLoan->save();
             }
-            $newLoan->save();
-        }
-        
-        // 4. Update related Transaction
-        $transaction = \App\Models\Transaction::where('reference_type', Payment::class)
-            ->where('reference_id', $payment->id)
-            ->first();
-            
-        if ($transaction) {
-            $transaction->update([
-                'amount' => $payment->amount,
-                'description' => "Payment for Loan #{$newLoan->id} - Ref: " . ($payment->reference_number ?? 'N/A'),
-            ]);
-        }
 
-        // 5. Update related Fund entry
-        $fund = \App\Models\Fund::where('reference_type', Payment::class)
-            ->where('reference_id', $payment->id)
-            ->first();
-            
-        if ($fund) {
-            $fund->update([
-                'amount' => $payment->amount,
-                'date' => $payment->payment_date ?? now(),
-                'description' => "Payment for Loan #{$newLoan->id} - Ref: " . ($payment->reference_number ?? 'N/A'),
-            ]);
-        }
+            // 2. Update payment details
+            $payment->fill($data);
+            $payment->save();
 
-        return $payment;
+            // 3. Apply effect of new payment on the new loan
+            $newLoan = $payment->loan ?: Loan::find($data['loan_id']);
+            if ($newLoan) {
+                $newBalance = round((float) $newLoan->remaining_balance - (float) $payment->amount, 2);
+                $newLoan->remaining_balance = max(0, $newBalance);
+                $newLoan->save();
+            }
+
+            $loanId = $newLoan?->id ?? $payment->loan_id;
+            $description = "Payment for Loan #{$loanId} - Ref: " . ($payment->reference_number ?? 'N/A');
+
+            // 4. Update related Transaction
+            $transaction = Transaction::where('reference_type', Payment::class)
+                ->where('reference_id', $payment->id)
+                ->first();
+
+            if ($transaction) {
+                $transaction->update([
+                    'amount' => $payment->amount,
+                    'description' => $description,
+                ]);
+            }
+
+            // 5. Update related Fund entry
+            $fund = Fund::where('reference_type', Payment::class)
+                ->where('reference_id', $payment->id)
+                ->first();
+
+            if ($fund) {
+                $fund->update([
+                    'amount' => $payment->amount,
+                    'date' => $payment->payment_date ?? now(),
+                    'description' => $description,
+                ]);
+            }
+
+            return $payment;
+        });
     }
 }

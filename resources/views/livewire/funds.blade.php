@@ -92,21 +92,25 @@
                                 {{ $fund->type === 'deposit' ? '+' : '-' }}{{ number_format($fund->amount, 2) }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                <button
-                                    type="button"
-                                    wire:click="editFund({{ $fund->id }})"
-                                    class="text-indigo-600 hover:text-indigo-900"
-                                >
-                                    Edit
-                                </button>
-                                <button
-                                    type="button"
-                                    wire:click="deleteFund({{ $fund->id }})"
-                                    wire:confirm="Delete this fund record?"
-                                    class="ml-3 text-red-600 hover:text-red-900"
-                                >
-                                    Delete
-                                </button>
+                                @if($fund->reference_type && $fund->reference_id)
+                                    <span class="text-xs text-gray-500">System entry</span>
+                                @else
+                                    <button
+                                        type="button"
+                                        wire:click="editFund({{ $fund->id }})"
+                                        class="text-indigo-600 hover:text-indigo-900"
+                                    >
+                                        Edit
+                                    </button>
+                                    <button
+                                        type="button"
+                                        wire:click="deleteFund({{ $fund->id }})"
+                                        wire:confirm="Delete this fund record?"
+                                        class="ml-3 text-red-600 hover:text-red-900"
+                                    >
+                                        Delete
+                                    </button>
+                                @endif
                             </td>
                         </tr>
                     @empty

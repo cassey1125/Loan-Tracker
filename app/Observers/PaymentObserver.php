@@ -14,9 +14,12 @@ class PaymentObserver
     public function created(Payment $payment): void
     {
         $loan = $payment->loan;
+        if (!$loan) {
+            return;
+        }
         
         // Update loan balance
-        $loan->remaining_balance -= $payment->amount;
+        $loan->remaining_balance = round((float) $loan->remaining_balance - (float) $payment->amount, 2);
         if ($loan->remaining_balance < 0) {
             $loan->remaining_balance = 0;
         }

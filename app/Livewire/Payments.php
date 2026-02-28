@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Http\Requests\StorePaymentRequest;
+use App\Models\Loan;
 use App\Models\Payment;
 use App\Repositories\LoanRepository;
 use App\Repositories\PaymentRepository;
@@ -54,16 +55,34 @@ class Payments extends Component
 
     public function updatePayment(PaymentService $service)
     {
+        $payment = Payment::findOrFail($this->editingPaymentId);
+
         $validated = $this->validate([
             'loan_id' => ['required', 'exists:loans,id'],
-            'amount' => ['required', 'numeric', 'min:0.01'],
+            'amount' => [
+                'required',
+                'numeric',
+                'min:0.01',
+                function ($attribute, $value, $fail) use ($payment) {
+                    $targetLoan = Loan::find($this->loan_id);
+                    if (!$targetLoan) {
+                        return;
+                    }
+
+                    $reversibleAmount = $payment->loan_id === $targetLoan->id ? (float) $payment->amount : 0.0;
+                    $allowed = (float) $targetLoan->remaining_balance + $reversibleAmount;
+
+                    if ((float) $value > $allowed) {
+                        $fail('The payment amount cannot exceed the remaining balance allowance of ' . number_format($allowed, 2) . '.');
+                    }
+                },
+            ],
             'payment_method' => ['required', 'string', 'in:cash,gcash,card'],
             'payment_date' => ['required', 'date'],
             'reference_number' => ['nullable', 'string', 'max:255'],
             'notes' => ['nullable', 'string'],
         ]);
 
-        $payment = Payment::find($this->editingPaymentId);
         $service->updatePayment($payment, $validated);
 
         $this->cancelEdit();

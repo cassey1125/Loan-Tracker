@@ -17,6 +17,10 @@ class Transaction extends Model
         'reference_type',
     ];
 
+    protected $casts = [
+        'amount' => 'decimal:2',
+    ];
+
     public function reference()
     {
         return $this->morphTo();
