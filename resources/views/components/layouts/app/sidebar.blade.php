@@ -9,7 +9,7 @@
     <flux:sidebar sticky collapsible="mobile"
         class="app-sidebar border-e border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
         <flux:sidebar.header>
-            <x-app-logo :sidebar="true" href="{{ route('dashboard') }}" wire:navigate />
+            <x-app-logo :sidebar="true" href="{{ route('dashboard') }}" wire:navigate class="app-sidebar-brand" />
             <flux:sidebar.collapse class="lg:hidden" />
         </flux:sidebar.header>
 
@@ -25,19 +25,19 @@
                     <x-slot:icon>
                         <span class="material-icons app-sidebar-icon">group</span>
                     </x-slot:icon>
-                    {{ __('Borrower List') }}
+                    {{ __('Borrowers') }}
                 </flux:sidebar.item>
                 <flux:sidebar.item :href="route('loans')" :current="request()->routeIs('loans')" wire:navigate class="app-sidebar-item">
                     <x-slot:icon>
                         <span class="material-icons app-sidebar-icon">account_balance</span>
                     </x-slot:icon>
-                    {{ __('Loan Management') }}
+                    {{ __('Loans') }}
                 </flux:sidebar.item>
                 <flux:sidebar.item :href="route('payments')" :current="request()->routeIs('payments')" wire:navigate class="app-sidebar-item">
                     <x-slot:icon>
                         <span class="material-icons app-sidebar-icon">payment</span>
                     </x-slot:icon>
-                    {{ __('Payment Management') }}
+                    {{ __('Payments') }}
                 </flux:sidebar.item>
                 <flux:sidebar.item :href="route('funds')" :current="request()->routeIs('funds')" wire:navigate class="app-sidebar-item">
                     <x-slot:icon>
@@ -50,27 +50,27 @@
                     <x-slot:icon>
                         <span class="material-icons app-sidebar-icon">history</span>
                     </x-slot:icon>
-                    {{ __('Paid / Completed Loans') }}
+                    {{ __('Paid Loans') }}
                 </flux:sidebar.item>
                 <flux:sidebar.item :href="route('investor-profit')" :current="request()->routeIs('investor-profit')"
                     wire:navigate class="app-sidebar-item">
                     <x-slot:icon>
                         <span class="material-icons app-sidebar-icon">trending_up</span>
                     </x-slot:icon>
-                    {{ __('Investor Profit') }}
+                    {{ __('Investor Returns') }}
                 </flux:sidebar.item>
                 <flux:sidebar.item :href="route('income_expense')" :current="request()->routeIs('income_expense')"
                     wire:navigate class="app-sidebar-item">
                     <x-slot:icon>
                         <span class="material-icons app-sidebar-icon">bar_chart</span>
                     </x-slot:icon>
-                    {{ __('Income & Expense Tracking') }}
+                    {{ __('Income & Expenses') }}
                 </flux:sidebar.item>
                 <flux:sidebar.item :href="route('reports')" :current="request()->routeIs('reports')" wire:navigate class="app-sidebar-item">
                     <x-slot:icon>
                         <span class="material-icons app-sidebar-icon">assessment</span>
                     </x-slot:icon>
-                    {{ __('Reports & Search Filters') }}
+                    {{ __('Reports') }}
                 </flux:sidebar.item>
                 <flux:sidebar.item :href="route('motor_rentals')" :current="request()->routeIs('motor_rentals')"
                     wire:navigate class="app-sidebar-item">
