@@ -67,8 +67,53 @@
 
         <!-- Statistics Line Chart -->
         <div class="bg-white shadow px-4 py-5 sm:rounded-lg sm:p-6 lg:col-span-2">
-            <h3 class="text-lg font-medium text-gray-900 mb-4">Lending Insights</h3>
-            <div id="lendingInsightsChart" class="h-64" data-chart="{{ json_encode($lineChartData) }}"></div>
+            <div class="flex items-center justify-between gap-3 mb-4">
+                <h3 class="text-lg font-medium text-gray-900">Lending Insights</h3>
+                <div class="flex items-center gap-2">
+                    <button
+                        type="button"
+                        wire:click="clearLendingInsights"
+                        class="inline-flex items-center rounded-md border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-100"
+                    >
+                        Delete
+                    </button>
+                    <button
+                        type="button"
+                        wire:click="resetLendingInsights"
+                        class="inline-flex items-center rounded-md border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50"
+                    >
+                        Reset
+                    </button>
+                </div>
+            </div>
+
+            @if ($insightsCleared)
+                <div class="h-64 flex items-center justify-center text-sm text-gray-500 border border-dashed border-gray-300 rounded-md">
+                    Lending insights cleared. Click Reset to load data again.
+                </div>
+            @else
+                <div id="lendingInsightsChart" class="h-64" data-chart="{{ json_encode($lineChartData) }}"></div>
+            @endif
+        </div>
+    </div>
+
+    <div class="bg-white shadow px-4 py-5 sm:rounded-lg sm:p-6">
+        <h3 class="text-lg font-medium text-gray-900 mb-4">Recent Activity</h3>
+
+        <div class="space-y-3">
+            @forelse ($recentActivities as $activity)
+                <div class="border border-gray-100 rounded-md px-4 py-3">
+                    <div class="flex items-center justify-between gap-4">
+                        <p class="text-sm font-semibold text-gray-900">{{ $activity['title'] }}</p>
+                        <p class="text-xs text-gray-500 whitespace-nowrap">
+                            {{ \Carbon\Carbon::parse($activity['timestamp'])->diffForHumans() }}
+                        </p>
+                    </div>
+                    <p class="text-sm text-gray-600 mt-1">{{ $activity['description'] }}</p>
+                </div>
+            @empty
+                <p class="text-sm text-gray-500">No recent activity found.</p>
+            @endforelse
         </div>
     </div>
 </div>

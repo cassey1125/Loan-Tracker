@@ -72,6 +72,13 @@
                     </x-slot:icon>
                     {{ __('Reports & Search Filters') }}
                 </flux:sidebar.item>
+                <flux:sidebar.item :href="route('motor_rentals')" :current="request()->routeIs('motor_rentals')"
+                    wire:navigate>
+                    <x-slot:icon>
+                        <span class="material-icons">two_wheeler</span>
+                    </x-slot:icon>
+                    {{ __('Motor Rentals') }}
+                </flux:sidebar.item>
             </flux:sidebar.group>
         </flux:sidebar.nav>
 

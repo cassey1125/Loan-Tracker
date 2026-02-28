@@ -86,4 +86,8 @@ Route::view('reports', 'reports')
     ->middleware(['auth', 'verified'])
     ->name('reports');
 
+Route::view('motor-rentals', 'motor-rentals')
+    ->middleware(['auth', 'verified'])
+    ->name('motor_rentals');
+
 require __DIR__.'/settings.php';

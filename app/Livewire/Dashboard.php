@@ -5,6 +5,7 @@ namespace App\Livewire;
 use App\Models\Fund;
 use App\Models\Investor;
 use App\Models\Loan;
+use App\Models\MotorRental;
 use App\Models\Payment;
 use App\Enums\LoanStatus;
 use Carbon\Carbon;
@@ -14,9 +15,20 @@ use Livewire\Component;
 class Dashboard extends Component
 {
     public $chartData = [];
+    public $insightsCleared = false;
 
     public function mount()
     {
+    }
+
+    public function clearLendingInsights(): void
+    {
+        $this->insightsCleared = true;
+    }
+
+    public function resetLendingInsights(): void
+    {
+        $this->insightsCleared = false;
     }
 
     public function render()
@@ -105,6 +117,83 @@ class Dashboard extends Component
             $cashInData[] = $cashIn;
         }
 
+        // Recent activity feed
+        $recentLoanActivities = Loan::with('borrower')
+            ->latest('created_at')
+            ->limit(5)
+            ->get()
+            ->map(function (Loan $loan) {
+                $borrower = $loan->borrower?->full_name ?? 'Unknown borrower';
+
+                return [
+                    'timestamp' => $loan->created_at,
+                    'title' => 'New loan created',
+                    'description' => $borrower . ' - P' . number_format((float) $loan->amount, 2),
+                ];
+            });
+
+        $recentPaymentActivities = Payment::with('loan.borrower')
+            ->latest('created_at')
+            ->limit(5)
+            ->get()
+            ->map(function (Payment $payment) {
+                $borrower = $payment->loan?->borrower?->full_name ?? 'Unknown borrower';
+
+                return [
+                    'timestamp' => $payment->created_at,
+                    'title' => 'Payment recorded',
+                    'description' => $borrower . ' - P' . number_format((float) $payment->amount, 2),
+                ];
+            });
+
+        $recentFundActivities = Fund::latest('created_at')
+            ->limit(5)
+            ->get()
+            ->map(function (Fund $fund) {
+                return [
+                    'timestamp' => $fund->created_at,
+                    'title' => ucfirst($fund->type) . ' fund entry',
+                    'description' => 'P' . number_format((float) $fund->amount, 2),
+                ];
+            });
+
+        $recentMotorRentalActivities = MotorRental::latest('created_at')
+            ->limit(5)
+            ->get()
+            ->map(function (MotorRental $rental) {
+                return [
+                    'timestamp' => $rental->created_at,
+                    'title' => 'Motor rental added',
+                    'description' => $rental->motor_name . ' - ' . $rental->rental_date->format('M d, Y'),
+                ];
+            });
+
+        $recentActivities = $recentLoanActivities
+            ->concat($recentPaymentActivities)
+            ->concat($recentFundActivities)
+            ->concat($recentMotorRentalActivities)
+            ->sortByDesc('timestamp')
+            ->take(10)
+            ->values();
+
+        $lineChartData = [
+            'labels' => $months,
+            'series' => [
+                ['name' => 'Total Lent', 'data' => $lentData],
+                ['name' => 'Cash In', 'data' => $cashInData],
+            ]
+        ];
+
+        if ($this->insightsCleared) {
+            $lineChartData = [
+                'labels' => [],
+                'series' => [
+                    ['name' => 'Total Lent', 'data' => []],
+                    ['name' => 'Cash In', 'data' => []],
+                ],
+            ];
+        }
+
         return view('livewire.dashboard', [
             'investors' => Investor::all(), // Kept for other potential uses if any, or can be removed
             'totalLent' => $totalLent,
@@ -116,13 +205,9 @@ class Dashboard extends Component
             'totalProfit' => $totalProfit,
             'totalInvestorFunds' => $totalInvestorFunds,
             'pieChartData' => $pieChartData,
-            'lineChartData' => [
-                'labels' => $months,
-                'series' => [
-                    ['name' => 'Total Lent', 'data' => $lentData],
-                    ['name' => 'Cash In', 'data' => $cashInData],
-                ]
-            ]
+            'lineChartData' => $lineChartData,
+            'insightsCleared' => $this->insightsCleared,
+            'recentActivities' => $recentActivities,
         ]);
     }
 }
