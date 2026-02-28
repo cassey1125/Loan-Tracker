@@ -33,6 +33,7 @@
                     <option value="">Select Interest Rate</option>
                     <option value="5">5%</option>
                     <option value="7">7%</option>
+                    <option value="10">10%</option>
                 </select>
                 @error('interest_rate') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
             </div>

@@ -20,7 +20,7 @@ class LoanFactory extends Factory
     {
         $borrower = Borrower::inRandomOrder()->first() ?? Borrower::factory()->create();
         $amount = $this->faker->randomFloat(2, 1000, 50000);
-        $interestRate = $this->faker->randomElement([5, 7]);
+        $interestRate = $this->faker->randomElement([5, 7, 10]);
         $paymentTerm = $this->faker->numberBetween(1, 12);
         
         // Interest = Principal * (Rate / 100) * Term

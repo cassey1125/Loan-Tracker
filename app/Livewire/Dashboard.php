@@ -50,21 +50,8 @@ class Dashboard extends Component
         $notYetPaidAmount = Loan::where('status', '!=', LoanStatus::PAID)->sum('remaining_balance');
         
         // Investor Earnings (Jo & Rob)
-        // Hardcoded logic from Loan model mapping: 5% loans -> Inv1=4%, Inv2=1%. 7% loans -> Inv1=5%, Inv2=2%.
-        $loans5 = Loan::where('interest_rate', 5)->get();
-        $loans7 = Loan::where('interest_rate', 7)->get();
-        
-        $earningsJo = 0;
-        $earningsRob = 0;
-
-        foreach ($loans5 as $loan) {
-            $earningsJo += $loan->investor1_interest;
-            $earningsRob += $loan->investor2_interest;
-        }
-        foreach ($loans7 as $loan) {
-            $earningsJo += $loan->investor1_interest;
-            $earningsRob += $loan->investor2_interest;
-        }
+        $earningsJo = $loans->sum(fn (Loan $loan) => $loan->investor1_interest);
+        $earningsRob = $loans->sum(fn (Loan $loan) => $loan->investor2_interest);
 
         $totalProfit = $earningsJo + $earningsRob;
 

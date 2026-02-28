@@ -63,89 +63,56 @@
     <h1>Investor Profit Analysis</h1>
     <p class="text-center">Generated on: {{ now()->format('F d, Y h:i A') }}</p>
 
-    <!-- 5% Loans Section -->
-    <h2>5% Interest Rate Loans</h2>
-    <div class="summary-box">
-        <div class="summary-item"><strong>Total Interest Generated:</strong> {{ number_format($summary['rate_5']['total_interest'], 2) }}</div>
-        <div class="summary-item text-indigo"><strong>Investor 1 Profit (4%):</strong> {{ number_format($summary['rate_5']['investor1'], 2) }}</div>
-        <div class="summary-item text-green"><strong>Investor 2 Profit (1%):</strong> {{ number_format($summary['rate_5']['investor2'], 2) }}</div>
-    </div>
+    @foreach($rates as $index => $rate)
+        @php
+            $groupLoans = $loanGroups[$rate] ?? collect();
+            $groupSummary = $summary["rate_{$rate}"] ?? null;
+        @endphp
 
-    <table>
-        <thead>
-            <tr>
-                <th>Loan ID</th>
-                <th>Principal</th>
-                <th>Term</th>
-                <th>Monthly Profit</th>
-                <th>Total Profit</th>
-                <th>Total Return</th>
-                <th>Inv 1 (4%)</th>
-                <th>Inv 2 (1%)</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse($loans5 as $loan)
-                <tr>
-                    <td>#{{ $loan->id }}</td>
-                    <td>{{ number_format($loan->amount, 2) }}</td>
-                    <td>{{ $loan->payment_term }} mo</td>
-                    <td>{{ number_format($loan->amount * 0.05, 2) }}</td>
-                    <td>{{ number_format($loan->interest_amount, 2) }} ({{ $loan->payment_term * 5 }}%)</td>
-                    <td>{{ number_format($loan->total_payable, 2) }}</td>
-                    <td class="text-indigo">{{ number_format($loan->investor1_interest, 2) }}</td>
-                    <td class="text-green">{{ number_format($loan->investor2_interest, 2) }}</td>
-                </tr>
-            @empty
-                <tr>
-                    <td colspan="8" class="text-center">No 5% loans found.</td>
-                </tr>
-            @endforelse
-        </tbody>
-    </table>
+        <h2>{{ $rate }}% Interest Rate Loans</h2>
+        <div class="summary-box">
+            <div class="summary-item"><strong>Total Interest Generated:</strong> {{ number_format($groupSummary['total_interest'], 2) }}</div>
+            <div class="summary-item text-indigo"><strong>Investor 1 Profit ({{ $groupSummary['investor1_rate'] }}%):</strong> {{ number_format($groupSummary['investor1'], 2) }}</div>
+            <div class="summary-item text-green"><strong>Investor 2 Profit ({{ $groupSummary['investor2_rate'] }}%):</strong> {{ number_format($groupSummary['investor2'], 2) }}</div>
+        </div>
 
-    <div style="page-break-after: always;"></div>
-
-    <!-- 7% Loans Section -->
-    <h2>7% Interest Rate Loans</h2>
-    <div class="summary-box">
-        <div class="summary-item"><strong>Total Interest Generated:</strong> {{ number_format($summary['rate_7']['total_interest'], 2) }}</div>
-        <div class="summary-item text-indigo"><strong>Investor 1 Profit (5%):</strong> {{ number_format($summary['rate_7']['investor1'], 2) }}</div>
-        <div class="summary-item text-green"><strong>Investor 2 Profit (2%):</strong> {{ number_format($summary['rate_7']['investor2'], 2) }}</div>
-    </div>
-
-    <table>
-        <thead>
-            <tr>
-                <th>Loan ID</th>
-                <th>Principal</th>
-                <th>Term</th>
-                <th>Monthly Profit</th>
-                <th>Total Profit</th>
-                <th>Total Return</th>
-                <th>Inv 1 (5%)</th>
-                <th>Inv 2 (2%)</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse($loans7 as $loan)
+        <table>
+            <thead>
                 <tr>
-                    <td>#{{ $loan->id }}</td>
-                    <td>{{ number_format($loan->amount, 2) }}</td>
-                    <td>{{ $loan->payment_term }} mo</td>
-                    <td>{{ number_format($loan->amount * 0.07, 2) }}</td>
-                    <td>{{ number_format($loan->interest_amount, 2) }} ({{ $loan->payment_term * 7 }}%)</td>
-                    <td>{{ number_format($loan->total_payable, 2) }}</td>
-                    <td class="text-indigo">{{ number_format($loan->investor1_interest, 2) }}</td>
-                    <td class="text-green">{{ number_format($loan->investor2_interest, 2) }}</td>
+                    <th>Loan ID</th>
+                    <th>Principal</th>
+                    <th>Term</th>
+                    <th>Monthly Profit</th>
+                    <th>Total Profit</th>
+                    <th>Total Return</th>
+                    <th>Inv 1 ({{ $groupSummary['investor1_rate'] }}%)</th>
+                    <th>Inv 2 ({{ $groupSummary['investor2_rate'] }}%)</th>
                 </tr>
-            @empty
-                <tr>
-                    <td colspan="8" class="text-center">No 7% loans found.</td>
-                </tr>
-            @endforelse
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @forelse($groupLoans as $loan)
+                    <tr>
+                        <td>#{{ $loan->id }}</td>
+                        <td>{{ number_format($loan->amount, 2) }}</td>
+                        <td>{{ $loan->payment_term }} mo</td>
+                        <td>{{ number_format($loan->amount * ($rate / 100), 2) }}</td>
+                        <td>{{ number_format($loan->interest_amount, 2) }} ({{ $loan->payment_term * $rate }}%)</td>
+                        <td>{{ number_format($loan->total_payable, 2) }}</td>
+                        <td class="text-indigo">{{ number_format($loan->investor1_interest, 2) }}</td>
+                        <td class="text-green">{{ number_format($loan->investor2_interest, 2) }}</td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="8" class="text-center">No {{ $rate }}% loans found.</td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+
+        @if($index < count($rates) - 1)
+            <div style="page-break-after: always;"></div>
+        @endif
+    @endforeach
 
 </body>
 </html>

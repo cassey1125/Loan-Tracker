@@ -44,11 +44,11 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ number_format($loan->interest_amount, 2) }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-green-600 font-medium">
                                     {{ number_format($inv1, 2) }}
-                                    <span class="text-xs text-gray-400">({{ $loan->interest_rate == 7 ? '5%' : '4%' }})</span>
+                                    <span class="text-xs text-gray-400">({{ $loan->investor1_rate }}%)</span>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-green-600 font-medium">
                                     {{ number_format($inv2, 2) }}
-                                    <span class="text-xs text-gray-400">({{ $loan->interest_rate == 7 ? '2%' : '1%' }})</span>
+                                    <span class="text-xs text-gray-400">({{ $loan->investor2_rate }}%)</span>
                                 </td>
                             </tr>
                         @empty
