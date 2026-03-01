@@ -7,6 +7,7 @@ use App\Factories\LoanFactory;
 use App\Models\Loan;
 use App\Repositories\LoanRepository;
 use App\Services\Loan\Interest\InterestCalculationStrategy;
+use Carbon\Carbon;
 
 class LoanService
 {
@@ -63,8 +64,9 @@ class LoanService
             'interest_amount' => $interest,
             'total_payable' => $totalPayable,
             'remaining_balance' => $remainingBalance,
-            // We might want to re-evaluate status based on new balance
-            'status' => $remainingBalance <= 0 ? LoanStatus::PAID : ($loan->status === LoanStatus::PAID ? LoanStatus::PENDING : $loan->status),
+            'status' => $remainingBalance <= 0
+                ? LoanStatus::PAID
+                : (Carbon::parse($data['due_date'])->isPast() ? LoanStatus::OVERDUE : LoanStatus::PENDING),
         ]));
 
         return $this->repository->save($loan);

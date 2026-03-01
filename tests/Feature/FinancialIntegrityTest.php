@@ -100,4 +100,74 @@ class FinancialIntegrityTest extends TestCase
             'amount' => 1250,
         ]);
     }
+
+    public function test_soft_deleting_payment_restores_loan_balance_and_removes_linked_entries(): void
+    {
+        $borrower = Borrower::factory()->create();
+
+        $loan = app(LoanService::class)->createLoan([
+            'borrower_id' => $borrower->id,
+            'amount' => 1000,
+            'interest_rate' => 5,
+            'payment_term' => 1,
+            'due_date' => now()->addMonth()->toDateString(),
+        ]);
+
+        $payment = Payment::create([
+            'loan_id' => $loan->id,
+            'amount' => 300,
+            'payment_method' => 'cash',
+            'payment_date' => now()->toDateString(),
+        ]);
+
+        $loan->refresh();
+        $this->assertEquals('750.00', $loan->remaining_balance);
+
+        $payment->delete();
+        $loan->refresh();
+
+        $this->assertEquals('1050.00', $loan->remaining_balance);
+
+        $this->assertDatabaseMissing('transactions', [
+            'reference_type' => Payment::class,
+            'reference_id' => $payment->id,
+        ]);
+
+        $this->assertSoftDeleted('payments', [
+            'id' => $payment->id,
+        ]);
+
+        $this->assertSoftDeleted('funds', [
+            'reference_type' => Payment::class,
+            'reference_id' => $payment->id,
+        ]);
+    }
+
+    public function test_updating_due_date_recomputes_status_based_on_new_date(): void
+    {
+        $borrower = Borrower::factory()->create();
+
+        $loan = Loan::factory()->create([
+            'borrower_id' => $borrower->id,
+            'amount' => 1000,
+            'interest_rate' => 5,
+            'payment_term' => 1,
+            'interest_amount' => 50,
+            'total_payable' => 1050,
+            'remaining_balance' => 1050,
+            'due_date' => now()->subDays(1)->toDateString(),
+            'status' => LoanStatus::OVERDUE,
+        ]);
+
+        app(LoanService::class)->updateLoan($loan, [
+            'borrower_id' => $borrower->id,
+            'amount' => 1000,
+            'interest_rate' => 5,
+            'payment_term' => 1,
+            'due_date' => now()->addMonth()->toDateString(),
+        ]);
+
+        $loan->refresh();
+        $this->assertEquals(LoanStatus::PENDING, $loan->status);
+    }
 }

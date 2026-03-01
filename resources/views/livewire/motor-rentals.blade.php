@@ -40,14 +40,14 @@
                     wire:click="selectDate('{{ $day['date'] }}')"
                     class="relative min-h-[74px] rounded-md border p-2 text-left transition
                         {{ $day['inCurrentMonth'] ? 'bg-white border-gray-200' : 'bg-gray-50 border-gray-100 text-gray-400' }}
-                        {{ $day['isOccupied'] ? 'ring-1 ring-indigo-300' : '' }}
-                        {{ $day['isSelected'] ? 'border-indigo-500 ring-2 ring-indigo-500' : '' }}"
+                        {{ $day['isOccupied'] ? 'bg-green-50 border-green-300 ring-1 ring-green-300' : '' }}
+                        {{ $day['isSelected'] ? ($day['isOccupied'] ? 'border-green-600 ring-2 ring-green-500' : 'border-indigo-500 ring-2 ring-indigo-500') : '' }}"
                 >
-                    <div class="text-sm font-semibold {{ $day['isToday'] ? 'text-indigo-700' : '' }}">
+                    <div class="text-sm font-semibold {{ $day['isToday'] ? 'text-indigo-700' : '' }} {{ $day['isOccupied'] ? 'text-green-800' : '' }}">
                         {{ $day['day'] }}
                     </div>
                     @if ($day['isOccupied'])
-                        <div class="mt-1 text-[11px] font-medium text-indigo-700">
+                        <div class="mt-1 text-[11px] font-medium text-green-700">
                             {{ $day['rentalsCount'] }} rented
                         </div>
                     @else

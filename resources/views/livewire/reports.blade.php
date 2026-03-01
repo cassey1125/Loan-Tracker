@@ -91,7 +91,7 @@
                     <div class="text-2xl font-bold text-red-600">₱{{ number_format($data['total_expenses'], 2) }}</div>
                 </div>
                 <div class="bg-gray-50 p-4 rounded-lg">
-                    <span class="text-sm text-gray-500">Net Profit</span>
+                    <span class="text-sm text-gray-500">Net Cash Flow</span>
                     <div class="text-2xl font-bold {{ $data['net_profit'] >= 0 ? 'text-blue-600' : 'text-red-600' }}">
                         ₱{{ number_format($data['net_profit'], 2) }}
                     </div>
@@ -205,7 +205,7 @@
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Month</th>
                             <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Total Income</th>
                             <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Total Expenses</th>
-                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Net Profit</th>
+                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Net Cash Flow</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
@@ -233,3 +233,4 @@
         </div>
     @endif
 </div>
+

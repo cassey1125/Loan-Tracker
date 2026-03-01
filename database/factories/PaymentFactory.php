@@ -20,7 +20,7 @@ class PaymentFactory extends Factory
         return [
             'loan_id' => Loan::factory(),
             'amount' => $this->faker->randomFloat(2, 100, 1000),
-            'payment_method' => $this->faker->randomElement(['cash', 'bank_transfer', 'check']),
+            'payment_method' => $this->faker->randomElement(['cash', 'gcash', 'card']),
             'payment_date' => $this->faker->date(),
             'reference_number' => $this->faker->uuid(),
             'notes' => $this->faker->sentence(),

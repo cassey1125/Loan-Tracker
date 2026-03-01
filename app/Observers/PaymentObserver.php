@@ -58,6 +58,22 @@ class PaymentObserver
 
     public function deleted(Payment $payment): void
     {
+        $loan = $payment->loan;
+        if ($loan) {
+            $restoredBalance = round((float) $loan->remaining_balance + (float) $payment->amount, 2);
+            $maxBalance = (float) $loan->total_payable;
+            $loan->remaining_balance = min($restoredBalance, $maxBalance);
+            $loan->save();
+        }
+
+        Transaction::where('reference_type', Payment::class)
+            ->where('reference_id', $payment->id)
+            ->delete();
+
+        Fund::where('reference_type', Payment::class)
+            ->where('reference_id', $payment->id)
+            ->delete();
+
         AuditLogger::log('deleted', $payment, $payment->attributesToArray(), null);
     }
 }

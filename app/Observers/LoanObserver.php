@@ -41,7 +41,7 @@ class LoanObserver
      */
     public function updating(Loan $loan): void
     {
-        if ($loan->isDirty('remaining_balance')) {
+        if ($loan->isDirty('remaining_balance') || $loan->isDirty('due_date')) {
             if ($loan->remaining_balance <= 0) {
                 $loan->status = \App\Enums\LoanStatus::PAID;
             } else {
@@ -83,6 +83,14 @@ class LoanObserver
 
     public function deleted(Loan $loan): void
     {
+        Transaction::where('reference_type', Loan::class)
+            ->where('reference_id', $loan->id)
+            ->delete();
+
+        Fund::where('reference_type', Loan::class)
+            ->where('reference_id', $loan->id)
+            ->delete();
+
         AuditLogger::log('deleted', $loan, $loan->attributesToArray(), null);
     }
 }

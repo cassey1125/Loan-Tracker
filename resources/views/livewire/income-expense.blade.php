@@ -16,21 +16,21 @@
 
     <!-- Summary Cards -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <!-- Total Income -->
+        <!-- Total Cash In (Payments) -->
         <div class="bg-white p-6 rounded-lg shadow-md flex flex-col">
-            <span class="text-sm text-gray-500">Total Income</span>
+            <span class="text-sm text-gray-500">Total Cash In (Payments)</span>
             <div class="text-2xl font-bold text-green-600">₱{{ number_format($totalIncome, 2) }}</div>
         </div>
 
-        <!-- Total Expenses -->
+        <!-- Total Cash Out (Loans Released) -->
         <div class="bg-white p-6 rounded-lg shadow-md flex flex-col">
-            <span class="text-sm text-gray-500">Total Expenses</span>
+            <span class="text-sm text-gray-500">Total Cash Out (Loans Released)</span>
             <div class="text-2xl font-bold text-red-600">₱{{ number_format($totalExpenses, 2) }}</div>
         </div>
 
-        <!-- Net Profit -->
+        <!-- Net Cash Flow -->
         <div class="bg-white p-6 rounded-lg shadow-md flex flex-col">
-            <span class="text-sm text-gray-500">Net Profit</span>
+            <span class="text-sm text-gray-500">Net Cash Flow</span>
             <div class="text-2xl font-bold {{ $netProfit >= 0 ? 'text-blue-600' : 'text-red-600' }}">
                 ₱{{ number_format($netProfit, 2) }}
             </div>
@@ -98,3 +98,4 @@
         </div>
     </div>
 </div>
+
