@@ -162,6 +162,7 @@
 
     {{ $slot }}
 
+    @include('partials.sweetalert')
     @fluxScripts
 </body>
 

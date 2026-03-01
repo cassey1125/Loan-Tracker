@@ -40,6 +40,7 @@ class Payments extends Component
         $this->payment_method = 'cash';
 
         session()->flash('message', 'Payment recorded successfully.');
+        $this->dispatch('swal:notify', type: 'success', message: 'Payment recorded successfully.');
     }
 
     public function editPayment($id)
@@ -92,6 +93,7 @@ class Payments extends Component
 
         $this->cancelEdit();
         session()->flash('message', 'Payment updated successfully.');
+        $this->dispatch('swal:notify', type: 'success', message: 'Payment updated successfully.');
     }
 
     public function cancelEdit()

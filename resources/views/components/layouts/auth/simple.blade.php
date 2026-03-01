@@ -17,6 +17,7 @@
                 </div>
             </div>
         </div>
+        @include('partials.sweetalert')
         @fluxScripts
     </body>
 </html>

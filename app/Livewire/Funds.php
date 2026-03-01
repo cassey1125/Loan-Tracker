@@ -52,9 +52,11 @@ class Funds extends Component
             $fund = Fund::findOrFail($this->editingFundId);
             $fund->update($payload);
             session()->flash('message', 'Fund updated successfully.');
+            $this->dispatch('swal:notify', type: 'success', message: 'Fund updated successfully.');
         } else {
             Fund::create($payload);
             session()->flash('message', 'Fund recorded successfully.');
+            $this->dispatch('swal:notify', type: 'success', message: 'Fund recorded successfully.');
         }
 
         $this->resetForm();
@@ -68,6 +70,7 @@ class Funds extends Component
         $fund = Fund::findOrFail($id);
         if ($this->isSystemGeneratedFund($fund)) {
             session()->flash('message', 'System-generated fund entries from loans/payments cannot be edited.');
+            $this->dispatch('swal:notify', type: 'info', message: 'System-generated fund entries from loans/payments cannot be edited.');
             return;
         }
 
@@ -90,6 +93,7 @@ class Funds extends Component
         $fund = Fund::findOrFail($id);
         if ($this->isSystemGeneratedFund($fund)) {
             session()->flash('message', 'System-generated fund entries from loans/payments cannot be deleted.');
+            $this->dispatch('swal:notify', type: 'info', message: 'System-generated fund entries from loans/payments cannot be deleted.');
             return;
         }
         $fund->delete();
@@ -99,6 +103,7 @@ class Funds extends Component
         }
 
         session()->flash('message', 'Fund deleted successfully.');
+        $this->dispatch('swal:notify', type: 'success', message: 'Fund deleted successfully.');
         $this->resetPage();
     }
 

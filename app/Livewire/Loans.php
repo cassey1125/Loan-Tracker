@@ -79,6 +79,7 @@ class Loans extends Component
         $this->reset(['borrower_id', 'amount', 'interest_rate', 'due_date', 'payment_term']);
         
         session()->flash('message', 'Loan created successfully.');
+        $this->dispatch('swal:notify', type: 'success', message: 'Loan created successfully.');
     }
 
     public function editLoan($id)
@@ -114,6 +115,7 @@ class Loans extends Component
 
         $this->cancelEdit();
         session()->flash('message', 'Loan updated successfully.');
+        $this->dispatch('swal:notify', type: 'success', message: 'Loan updated successfully.');
     }
 
     public function cancelEdit()
