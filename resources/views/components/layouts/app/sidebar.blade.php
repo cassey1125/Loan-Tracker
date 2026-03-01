@@ -88,6 +88,15 @@
                         {{ __('Integrity Check') }}
                     </flux:sidebar.item>
                 @endif
+                @if(auth()->user()?->canManageUserRoles())
+                    <flux:sidebar.item :href="route('admin.roles.index')" :current="request()->routeIs('admin.roles.*')"
+                        wire:navigate class="app-sidebar-item">
+                        <x-slot:icon>
+                            <span class="material-icons app-sidebar-icon">admin_panel_settings</span>
+                        </x-slot:icon>
+                        {{ __('Role Management') }}
+                    </flux:sidebar.item>
+                @endif
             </flux:sidebar.group>
         </flux:sidebar.nav>
 

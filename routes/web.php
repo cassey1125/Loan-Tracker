@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\IntegrityCheckController;
+use App\Http\Controllers\RoleManagementController;
 
 use App\Livewire\Borrowers\BorrowerCreate;
 use App\Livewire\Borrowers\BorrowerEdit;
@@ -65,6 +66,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('admin/integrity-check', [IntegrityCheckController::class, 'index'])
         ->middleware('role:owner,admin')
         ->name('admin.integrity-check');
+
+    Route::get('admin/roles', [RoleManagementController::class, 'index'])
+        ->middleware('role:owner')
+        ->name('admin.roles.index');
+
+    Route::patch('admin/roles/{user}', [RoleManagementController::class, 'update'])
+        ->middleware('role:owner')
+        ->name('admin.roles.update');
 });
 
 Route::view('loans', 'loans')

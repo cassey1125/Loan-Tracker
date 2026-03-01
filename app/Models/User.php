@@ -63,6 +63,11 @@ class User extends Authenticatable
         return $this->canManageFinancialRecords();
     }
 
+    public function canManageUserRoles(): bool
+    {
+        return $this->role === UserRole::OWNER;
+    }
+
     /**
      * Get the user's initials
      */

@@ -48,6 +48,12 @@
                         {{ __('Integrity Check') }}
                     </flux:navbar.item>
                 @endif
+                @if(auth()->user()?->canManageUserRoles())
+                    <flux:navbar.item :href="route('admin.roles.index')" :current="request()->routeIs('admin.roles.*')" wire:navigate>
+                        <span class="material-icons mr-2">admin_panel_settings</span>
+                        {{ __('Role Management') }}
+                    </flux:navbar.item>
+                @endif
             </flux:navbar>
 
             <flux:spacer />
@@ -124,6 +130,12 @@
                         <flux:sidebar.item :href="route('admin.integrity-check')" :current="request()->routeIs('admin.integrity-check')" wire:navigate>
                             <span class="material-icons mr-2">verified_user</span>
                             {{ __('Integrity Check') }}
+                        </flux:sidebar.item>
+                    @endif
+                    @if(auth()->user()?->canManageUserRoles())
+                        <flux:sidebar.item :href="route('admin.roles.index')" :current="request()->routeIs('admin.roles.*')" wire:navigate>
+                            <span class="material-icons mr-2">admin_panel_settings</span>
+                            {{ __('Role Management') }}
                         </flux:sidebar.item>
                     @endif
                 </flux:sidebar.group>
