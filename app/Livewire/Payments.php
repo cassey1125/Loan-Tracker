@@ -10,6 +10,7 @@ use App\Repositories\PaymentRepository;
 use App\Services\Payment\PaymentService;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class Payments extends Component
 {
@@ -43,6 +44,8 @@ class Payments extends Component
 
     public function editPayment($id)
     {
+        $this->ensureCanManageFinancialRecords();
+
         $this->editingPaymentId = $id;
         $payment = Payment::find($id);
         $this->loan_id = $payment->loan_id;
@@ -55,6 +58,8 @@ class Payments extends Component
 
     public function updatePayment(PaymentService $service)
     {
+        $this->ensureCanManageFinancialRecords();
+
         $payment = Payment::findOrFail($this->editingPaymentId);
 
         $validated = $this->validate([
@@ -102,5 +107,13 @@ class Payments extends Component
             'payments' => $paymentRepository->getAll(),
             'activeLoans' => $loanRepository->getActiveLoans(),
         ]);
+    }
+
+    private function ensureCanManageFinancialRecords(): void
+    {
+        $user = auth()->user();
+        if (!$user || !$user->canManageFinancialRecords()) {
+            throw new HttpException(403, 'Only owner/admin can modify financial records.');
+        }
     }
 }

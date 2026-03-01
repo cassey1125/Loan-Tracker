@@ -42,6 +42,12 @@
                     <span class="material-icons mr-2">assessment</span>
                     {{ __('Reports & Search Filters') }}
                 </flux:navbar.item>
+                @if(auth()->user()?->canViewIntegrityDashboard())
+                    <flux:navbar.item :href="route('admin.integrity-check')" :current="request()->routeIs('admin.integrity-check')" wire:navigate>
+                        <span class="material-icons mr-2">verified_user</span>
+                        {{ __('Integrity Check') }}
+                    </flux:navbar.item>
+                @endif
             </flux:navbar>
 
             <flux:spacer />
@@ -114,6 +120,12 @@
                         <span class="material-icons mr-2">assessment</span>
                         {{ __('Reports & Search Filters') }}
                     </flux:sidebar.item>
+                    @if(auth()->user()?->canViewIntegrityDashboard())
+                        <flux:sidebar.item :href="route('admin.integrity-check')" :current="request()->routeIs('admin.integrity-check')" wire:navigate>
+                            <span class="material-icons mr-2">verified_user</span>
+                            {{ __('Integrity Check') }}
+                        </flux:sidebar.item>
+                    @endif
                 </flux:sidebar.group>
             </flux:sidebar.nav>
 

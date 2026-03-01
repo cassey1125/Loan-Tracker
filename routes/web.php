@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\IntegrityCheckController;
 
 use App\Livewire\Borrowers\BorrowerCreate;
 use App\Livewire\Borrowers\BorrowerEdit;
@@ -60,6 +61,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('investor-profit/pdf', [App\Http\Controllers\InvestorProfitController::class, 'downloadPdf'])
         ->name('investor-profit.pdf');
+
+    Route::get('admin/integrity-check', [IntegrityCheckController::class, 'index'])
+        ->middleware('role:owner,admin')
+        ->name('admin.integrity-check');
 });
 
 Route::view('loans', 'loans')

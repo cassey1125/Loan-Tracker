@@ -92,7 +92,9 @@
                                 {{ $fund->type === 'deposit' ? '+' : '-' }}{{ number_format($fund->amount, 2) }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                @if($fund->reference_type && $fund->reference_id)
+                                @if(!auth()->user()?->canManageFinancialRecords())
+                                    <span class="text-xs text-gray-400">View only</span>
+                                @elseif($fund->reference_type && $fund->reference_id)
                                     <span class="text-xs text-gray-500">System entry</span>
                                 @else
                                     <button

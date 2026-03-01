@@ -5,10 +5,11 @@ namespace App\Models;
 use App\Enums\LoanStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Loan extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     private const INVESTOR_RATE_SPLITS = [
         5 => ['investor1' => 4.0, 'investor2' => 1.0],

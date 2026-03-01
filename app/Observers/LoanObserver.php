@@ -5,6 +5,7 @@ namespace App\Observers;
 use App\Models\Fund;
 use App\Models\Loan;
 use App\Models\Transaction;
+use App\Services\Monitoring\AuditLogger;
 
 class LoanObserver
 {
@@ -31,6 +32,8 @@ class LoanObserver
             'reference_id' => $loan->id,
             'reference_type' => Loan::class,
         ]);
+
+        AuditLogger::log('created', $loan, null, $loan->attributesToArray());
     }
 
     /**
@@ -54,6 +57,11 @@ class LoanObserver
      */
     public function updated(Loan $loan): void
     {
+        $changes = AuditLogger::onlyDirtyAttributes($loan);
+        if (!empty($changes['before']) || !empty($changes['after'])) {
+            AuditLogger::log('updated', $loan, $changes['before'], $changes['after']);
+        }
+
         if (!$loan->wasChanged('amount')) {
             return;
         }
@@ -71,5 +79,10 @@ class LoanObserver
                 'amount' => $loan->amount,
                 'description' => "Loan release for Loan #{$loan->id}",
             ]);
+    }
+
+    public function deleted(Loan $loan): void
+    {
+        AuditLogger::log('deleted', $loan, $loan->attributesToArray(), null);
     }
 }

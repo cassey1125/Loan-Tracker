@@ -115,7 +115,11 @@
                                 {{ $payment->reference_number ?? '-' }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <button wire:click="editPayment({{ $payment->id }})" class="text-indigo-600 hover:text-indigo-900">Edit</button>
+                                @if(auth()->user()?->canManageFinancialRecords())
+                                    <button wire:click="editPayment({{ $payment->id }})" class="text-indigo-600 hover:text-indigo-900">Edit</button>
+                                @else
+                                    <span class="text-xs text-gray-400">View only</span>
+                                @endif
                             </td>
                         </tr>
                     @empty

@@ -8,6 +8,7 @@ use App\Models\Loan;
 use App\Repositories\LoanRepository;
 use App\Services\Loan\LoanService;
 use Livewire\Component;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class Loans extends Component
 {
@@ -82,6 +83,8 @@ class Loans extends Component
 
     public function editLoan($id)
     {
+        $this->ensureCanManageFinancialRecords();
+
         $this->editingLoanId = $id;
         $loan = Loan::find($id);
         $this->borrower_id = $loan->borrower_id;
@@ -93,6 +96,8 @@ class Loans extends Component
 
     public function updateLoan(LoanService $service)
     {
+        $this->ensureCanManageFinancialRecords();
+
         // Ensure term is set if due date is present
         if ($this->due_date && !$this->payment_term) {
              $this->updatedDueDate();
@@ -114,5 +119,13 @@ class Loans extends Component
     public function cancelEdit()
     {
         $this->reset(['borrower_id', 'amount', 'interest_rate', 'due_date', 'payment_term', 'editingLoanId']);
+    }
+
+    private function ensureCanManageFinancialRecords(): void
+    {
+        $user = auth()->user();
+        if (!$user || !$user->canManageFinancialRecords()) {
+            throw new HttpException(403, 'Only owner/admin can modify financial records.');
+        }
     }
 }

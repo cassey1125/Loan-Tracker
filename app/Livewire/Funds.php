@@ -5,6 +5,7 @@ namespace App\Livewire;
 use App\Models\Fund;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class Funds extends Component
 {
@@ -46,6 +47,8 @@ class Funds extends Component
         ];
 
         if ($this->editingFundId) {
+            $this->ensureCanManageFinancialRecords();
+
             $fund = Fund::findOrFail($this->editingFundId);
             $fund->update($payload);
             session()->flash('message', 'Fund updated successfully.');
@@ -60,6 +63,8 @@ class Funds extends Component
 
     public function editFund(int $id): void
     {
+        $this->ensureCanManageFinancialRecords();
+
         $fund = Fund::findOrFail($id);
         if ($this->isSystemGeneratedFund($fund)) {
             session()->flash('message', 'System-generated fund entries from loans/payments cannot be edited.');
@@ -80,6 +85,8 @@ class Funds extends Component
 
     public function deleteFund(int $id): void
     {
+        $this->ensureCanManageFinancialRecords();
+
         $fund = Fund::findOrFail($id);
         if ($this->isSystemGeneratedFund($fund)) {
             session()->flash('message', 'System-generated fund entries from loans/payments cannot be deleted.');
@@ -131,6 +138,14 @@ class Funds extends Component
         }
 
         return max(0, round($available, 2));
+    }
+
+    private function ensureCanManageFinancialRecords(): void
+    {
+        $user = auth()->user();
+        if (!$user || !$user->canManageFinancialRecords()) {
+            throw new HttpException(403, 'Only owner/admin can modify financial records.');
+        }
     }
 
     public function render()

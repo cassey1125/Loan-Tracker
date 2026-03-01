@@ -79,6 +79,15 @@
                     </x-slot:icon>
                     {{ __('Motor Rentals') }}
                 </flux:sidebar.item>
+                @if(auth()->user()?->canViewIntegrityDashboard())
+                    <flux:sidebar.item :href="route('admin.integrity-check')" :current="request()->routeIs('admin.integrity-check')"
+                        wire:navigate class="app-sidebar-item">
+                        <x-slot:icon>
+                            <span class="material-icons app-sidebar-icon">verified_user</span>
+                        </x-slot:icon>
+                        {{ __('Integrity Check') }}
+                    </flux:sidebar.item>
+                @endif
             </flux:sidebar.group>
         </flux:sidebar.nav>
 

@@ -5,6 +5,7 @@ namespace App\Observers;
 use App\Models\Fund;
 use App\Models\Payment;
 use App\Models\Transaction;
+use App\Services\Monitoring\AuditLogger;
 
 class PaymentObserver
 {
@@ -43,5 +44,20 @@ class PaymentObserver
             'reference_id' => $payment->id,
             'reference_type' => Payment::class,
         ]);
+
+        AuditLogger::log('created', $payment, null, $payment->attributesToArray());
+    }
+
+    public function updated(Payment $payment): void
+    {
+        $changes = AuditLogger::onlyDirtyAttributes($payment);
+        if (!empty($changes['before']) || !empty($changes['after'])) {
+            AuditLogger::log('updated', $payment, $changes['before'], $changes['after']);
+        }
+    }
+
+    public function deleted(Payment $payment): void
+    {
+        AuditLogger::log('deleted', $payment, $payment->attributesToArray(), null);
     }
 }

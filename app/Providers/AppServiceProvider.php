@@ -2,8 +2,10 @@
 
 namespace App\Providers;
 
+use App\Models\Fund;
 use App\Models\Loan;
 use App\Models\Payment;
+use App\Observers\FundObserver;
 use App\Observers\LoanObserver;
 use App\Observers\PaymentObserver;
 use App\Services\Loan\Interest\FlatRateInterestStrategy;
@@ -32,5 +34,6 @@ class AppServiceProvider extends ServiceProvider
 
         Loan::observe(LoanObserver::class);
         Payment::observe(PaymentObserver::class);
+        Fund::observe(FundObserver::class);
     }
 }
