@@ -24,6 +24,8 @@ class Funds extends Component
 
     public function saveFund()
     {
+        $this->ensureCanManageFinancialRecords();
+
         $validated = $this->validate([
             'amount' => 'required|numeric|min:0.01',
             'transactionType' => 'required|in:deposit,withdrawal',

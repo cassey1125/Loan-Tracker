@@ -67,6 +67,8 @@ class Loans extends Component
 
     public function createLoan(LoanService $service)
     {
+        $this->ensureCanManageFinancialRecords();
+
         // Ensure term is set if due date is present
         if ($this->due_date && !$this->payment_term) {
              $this->updatedDueDate();

@@ -31,6 +31,8 @@ class Payments extends Component
 
     public function createPayment(PaymentService $service)
     {
+        $this->ensureCanManageFinancialRecords();
+
         $validated = $this->validate((new StorePaymentRequest())->rules());
 
         $service->createPayment($validated);
