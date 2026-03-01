@@ -9,11 +9,32 @@ use Illuminate\Http\Request;
 
 class RoleManagementController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $search = trim((string) $request->query('search', ''));
+        $filterRole = trim((string) $request->query('role', ''));
+        $validRoles = array_map(fn (UserRole $r) => $r->value, UserRole::cases());
+
+        $query = User::query()->orderBy('name');
+
+        if ($search !== '') {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+
+        if ($filterRole !== '' && in_array($filterRole, $validRoles, true)) {
+            $query->where('role', $filterRole);
+        }
+
         return view('admin.role-management', [
-            'users' => User::orderBy('name')->get(),
+            'users' => $query->get(),
             'roles' => UserRole::cases(),
+            'filters' => [
+                'search' => $search,
+                'role' => $filterRole,
+            ],
         ]);
     }
 
