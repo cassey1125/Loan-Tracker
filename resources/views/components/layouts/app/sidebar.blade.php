@@ -97,6 +97,15 @@
                         {{ __('Role Management') }}
                     </flux:sidebar.item>
                 @endif
+                @if(auth()->user()?->canManageBackups())
+                    <flux:sidebar.item :href="route('admin.backups.index')" :current="request()->routeIs('admin.backups.*')"
+                        wire:navigate class="app-sidebar-item">
+                        <x-slot:icon>
+                            <span class="material-icons app-sidebar-icon">backup</span>
+                        </x-slot:icon>
+                        {{ __('Backup Management') }}
+                    </flux:sidebar.item>
+                @endif
             </flux:sidebar.group>
         </flux:sidebar.nav>
 

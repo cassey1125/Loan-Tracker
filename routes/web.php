@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\IntegrityCheckController;
+use App\Http\Controllers\BackupManagementController;
 use App\Http\Controllers\RoleManagementController;
 
 use App\Livewire\Borrowers\BorrowerCreate;
@@ -74,6 +75,26 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('admin/roles/{user}', [RoleManagementController::class, 'update'])
         ->middleware('role:owner')
         ->name('admin.roles.update');
+
+    Route::get('admin/backups', [BackupManagementController::class, 'index'])
+        ->middleware('role:owner,admin')
+        ->name('admin.backups.index');
+
+    Route::post('admin/backups/run', [BackupManagementController::class, 'backupNow'])
+        ->middleware('role:owner,admin')
+        ->name('admin.backups.run');
+
+    Route::post('admin/backups/verify', [BackupManagementController::class, 'verifyNow'])
+        ->middleware('role:owner,admin')
+        ->name('admin.backups.verify');
+
+    Route::post('admin/backups/restore', [BackupManagementController::class, 'restore'])
+        ->middleware('role:owner')
+        ->name('admin.backups.restore');
+
+    Route::delete('admin/backups/delete', [BackupManagementController::class, 'delete'])
+        ->middleware('role:owner')
+        ->name('admin.backups.delete');
 });
 
 Route::view('loans', 'loans')

@@ -54,6 +54,12 @@
                         {{ __('Role Management') }}
                     </flux:navbar.item>
                 @endif
+                @if(auth()->user()?->canManageBackups())
+                    <flux:navbar.item :href="route('admin.backups.index')" :current="request()->routeIs('admin.backups.*')" wire:navigate>
+                        <span class="material-icons mr-2">backup</span>
+                        {{ __('Backup Management') }}
+                    </flux:navbar.item>
+                @endif
             </flux:navbar>
 
             <flux:spacer />
@@ -136,6 +142,12 @@
                         <flux:sidebar.item :href="route('admin.roles.index')" :current="request()->routeIs('admin.roles.*')" wire:navigate>
                             <span class="material-icons mr-2">admin_panel_settings</span>
                             {{ __('Role Management') }}
+                        </flux:sidebar.item>
+                    @endif
+                    @if(auth()->user()?->canManageBackups())
+                        <flux:sidebar.item :href="route('admin.backups.index')" :current="request()->routeIs('admin.backups.*')" wire:navigate>
+                            <span class="material-icons mr-2">backup</span>
+                            {{ __('Backup Management') }}
                         </flux:sidebar.item>
                     @endif
                 </flux:sidebar.group>

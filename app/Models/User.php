@@ -68,6 +68,16 @@ class User extends Authenticatable
         return $this->role === UserRole::OWNER;
     }
 
+    public function canManageBackups(): bool
+    {
+        return in_array($this->role, [UserRole::OWNER, UserRole::ADMIN], true);
+    }
+
+    public function canRestoreOrDeleteBackups(): bool
+    {
+        return $this->role === UserRole::OWNER;
+    }
+
     /**
      * Get the user's initials
      */
