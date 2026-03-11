@@ -2,8 +2,10 @@
 
 namespace App\Services\Loan;
 
+use App\Exceptions\InsufficientFundsException;
 use App\Enums\LoanStatus;
 use App\Factories\LoanFactory;
+use App\Models\Fund;
 use App\Models\Loan;
 use App\Repositories\LoanRepository;
 use App\Services\Loan\Interest\InterestCalculationStrategy;
@@ -20,6 +22,8 @@ class LoanService
     public function createLoan(array $data): Loan
     {
         $amount = (float) $data['amount'];
+        $this->ensureSufficientFunds($amount);
+
         $rate = (float) $data['interest_rate'];
         $term = (int) $data['payment_term'];
 
@@ -41,6 +45,11 @@ class LoanService
     public function updateLoan(Loan $loan, array $data): Loan
     {
         $amount = (float) $data['amount'];
+        $additionalRequired = round($amount - (float) $loan->amount, 2);
+        if ($additionalRequired > 0) {
+            $this->ensureSufficientFunds($additionalRequired);
+        }
+
         $rate = (float) $data['interest_rate'];
         $term = (int) $data['payment_term'];
 
@@ -70,5 +79,21 @@ class LoanService
         ]));
 
         return $this->repository->save($loan);
+    }
+
+    private function ensureSufficientFunds(float $requiredAmount): void
+    {
+        $availableFunds = $this->availableFundBalance();
+        if ($requiredAmount > $availableFunds) {
+            throw new InsufficientFundsException($availableFunds);
+        }
+    }
+
+    private function availableFundBalance(): float
+    {
+        $deposits = (float) Fund::where('type', 'deposit')->sum('amount');
+        $withdrawals = (float) Fund::where('type', 'withdrawal')->sum('amount');
+
+        return max(0, round($deposits - $withdrawals, 2));
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Settings;
 
+use App\Enums\UserRole;
 use App\Livewire\Settings\Profile;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -57,7 +58,8 @@ class ProfileUpdateTest extends TestCase
 
     public function test_user_can_delete_their_account(): void
     {
-        $user = User::factory()->create();
+        // Non-owner users can always delete their own account.
+        $user = User::factory()->create(['role' => UserRole::STAFF]);
 
         $this->actingAs($user);
 
@@ -73,9 +75,44 @@ class ProfileUpdateTest extends TestCase
         $this->assertFalse(auth()->check());
     }
 
+    public function test_owner_can_delete_account_when_another_owner_exists(): void
+    {
+        // A second owner must exist in the system.
+        User::factory()->create(['role' => UserRole::OWNER]);
+        $user = User::factory()->create(['role' => UserRole::OWNER]);
+
+        $this->actingAs($user);
+
+        $response = Livewire::test('settings.delete-user-form')
+            ->set('password', 'password')
+            ->call('deleteUser');
+
+        $response
+            ->assertHasNoErrors()
+            ->assertRedirect('/');
+
+        $this->assertNull($user->fresh());
+    }
+
+    public function test_last_owner_cannot_delete_their_account(): void
+    {
+        // Sole owner — deletion must be blocked to prevent system lockout.
+        $user = User::factory()->create(['role' => UserRole::OWNER]);
+
+        $this->actingAs($user);
+
+        $response = Livewire::test('settings.delete-user-form')
+            ->set('password', 'password')
+            ->call('deleteUser');
+
+        $response->assertHasErrors(['password']);
+
+        $this->assertNotNull($user->fresh());
+    }
+
     public function test_correct_password_must_be_provided_to_delete_account(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->create(['role' => UserRole::STAFF]);
 
         $this->actingAs($user);
 

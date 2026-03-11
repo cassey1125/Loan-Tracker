@@ -55,7 +55,7 @@
                         @forelse($paymentsList as $payment)
                             <tr>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $payment->payment_date->format('M d, Y') }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $payment->loan->borrower->first_name }} {{ $payment->loan->borrower->last_name }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $payment->loan?->borrower?->first_name }} {{ $payment->loan?->borrower?->last_name }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-right font-medium text-green-600">₱{{ number_format($payment->amount, 2) }}</td>
                             </tr>
                         @empty
@@ -84,7 +84,7 @@
                         @forelse($loansList as $loan)
                             <tr>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $loan->created_at->format('M d, Y') }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $loan->borrower->first_name }} {{ $loan->borrower->last_name }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $loan->borrower?->first_name }} {{ $loan->borrower?->last_name }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-right font-medium text-red-600">₱{{ number_format($loan->amount, 2) }}</td>
                             </tr>
                         @empty

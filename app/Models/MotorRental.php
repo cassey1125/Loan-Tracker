@@ -13,10 +13,19 @@ class MotorRental extends Model
         'motor_name',
         'renter_name',
         'rental_date',
+        'rental_days',
+        'rental_end_date',
         'notes',
     ];
 
     protected $casts = [
         'rental_date' => 'date',
+        'rental_end_date' => 'date',
+        'rental_days' => 'integer',
     ];
+
+    public function getDurationLabelAttribute(): string
+    {
+        return $this->rental_days === 1 ? '1 day' : $this->rental_days . ' days';
+    }
 }

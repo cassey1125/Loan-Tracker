@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Livewire\Loans;
 use App\Models\Borrower;
+use App\Models\Fund;
 use App\Models\Loan;
 use App\Models\Transaction;
 use App\Models\User;
@@ -19,6 +20,13 @@ class LoanTest extends TestCase
     {
         $user = User::factory()->create();
         $borrower = Borrower::factory()->create();
+
+        Fund::create([
+            'date' => now()->toDateString(),
+            'amount' => 2000,
+            'type' => 'deposit',
+            'description' => 'Initial capital for lending',
+        ]);
 
         Livewire::actingAs($user)
             ->test(Loans::class)
@@ -53,6 +61,31 @@ class LoanTest extends TestCase
             'reference_id' => $loan->id,
             'reference_type' => Loan::class,
         ]);
+    }
+
+    public function test_cannot_create_loan_when_amount_is_greater_than_available_funds(): void
+    {
+        $user = User::factory()->create();
+        $borrower = Borrower::factory()->create();
+
+        Fund::create([
+            'date' => now()->toDateString(),
+            'amount' => 500,
+            'type' => 'deposit',
+            'description' => 'Limited initial capital',
+        ]);
+
+        Livewire::actingAs($user)
+            ->test(Loans::class)
+            ->set('borrower_id', $borrower->id)
+            ->set('amount', 1000)
+            ->set('interest_rate', 5)
+            ->set('due_date', now()->addMonth()->format('Y-m-d'))
+            ->set('payment_term', 4)
+            ->call('createLoan')
+            ->assertHasErrors(['amount']);
+
+        $this->assertDatabaseCount('loans', 0);
     }
 
     public function test_validation_rules()

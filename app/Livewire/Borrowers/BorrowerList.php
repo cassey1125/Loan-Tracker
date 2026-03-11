@@ -5,6 +5,7 @@ namespace App\Livewire\Borrowers;
 use App\Models\Borrower;
 use App\Repositories\BorrowerRepository;
 use App\Services\Borrower\BorrowerService;
+use Illuminate\Validation\ValidationException;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -26,9 +27,23 @@ class BorrowerList extends Component
 
     public function delete(BorrowerService $service, $id)
     {
+        $user = auth()->user();
+        if (!$user || !$user->canManageFinancialRecords()) {
+            $this->dispatch('swal:notify', type: 'error', message: 'Only owner/admin can delete borrowers.');
+            return;
+        }
+
         $borrower = Borrower::findOrFail($id);
-        $service->deleteBorrower($borrower);
-        
+
+        try {
+            $service->deleteBorrower($borrower);
+            $this->dispatch('swal:notify', type: 'success', message: 'Borrower deleted successfully.');
+        } catch (ValidationException $e) {
+            $message = collect($e->errors())->flatten()->first()
+                ?? 'Cannot delete this borrower.';
+            $this->dispatch('swal:notify', type: 'error', message: $message);
+        }
+
         session()->flash('message', 'Borrower deleted successfully.');
     }
 

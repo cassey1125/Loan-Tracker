@@ -32,8 +32,10 @@ class PaymentService
             $payment->fill($data);
             $payment->save();
 
-            // 3. Apply effect of new payment on the new loan
-            $newLoan = $payment->loan ?: Loan::find($data['loan_id']);
+            // 3. Apply effect of new payment on the new loan.
+            // Always fetch fresh to avoid Eloquent's cached relationship returning the old loan
+            // after fill() changed loan_id in memory.
+            $newLoan = Loan::find($data['loan_id']);
             if ($newLoan) {
                 $newBalance = round((float) $newLoan->remaining_balance - (float) $payment->amount, 2);
                 $newLoan->remaining_balance = max(0, $newBalance);

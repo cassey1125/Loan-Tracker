@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
 
@@ -31,13 +32,13 @@ class BackupManagementController extends Controller
 
     public function backupNow(): RedirectResponse
     {
-        Artisan::call('db:backup-daily');
+        $exit = Artisan::call('db:backup-daily');
 
-        if (Artisan::output() && str_contains(strtolower(Artisan::output()), 'failed')) {
+        if ($exit !== 0) {
             return back()->with('error', trim(Artisan::output()));
         }
 
-        return back()->with('message', 'Backup completed.');
+        return back()->with('message', trim(Artisan::output()) ?: 'Backup completed.');
     }
 
     public function verifyNow(): RedirectResponse
@@ -67,7 +68,12 @@ class BackupManagementController extends Controller
             return back()->with('error', trim(Artisan::output()));
         }
 
-        return back()->with('message', trim(Artisan::output()));
+        // Restoring user records can invalidate identity assumptions in the current session.
+        Auth::guard('web')->logout();
+        request()->session()->invalidate();
+        request()->session()->regenerateToken();
+
+        return redirect()->route('login')->with('status', 'Restore completed. Please log in again.');
     }
 
     public function delete(): RedirectResponse

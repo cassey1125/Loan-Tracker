@@ -4,6 +4,7 @@ namespace App\Services\Borrower;
 
 use App\Models\Borrower;
 use App\Repositories\BorrowerRepository;
+use Illuminate\Validation\ValidationException;
 
 class BorrowerService
 {
@@ -21,6 +22,12 @@ class BorrowerService
 
     public function deleteBorrower(Borrower $borrower): bool
     {
+        if ($borrower->loans()->exists()) {
+            throw ValidationException::withMessages([
+                'borrower' => 'Cannot delete a borrower who has loan records. Remove or reassign their loans first.',
+            ]);
+        }
+
         return $this->repository->delete($borrower);
     }
 }

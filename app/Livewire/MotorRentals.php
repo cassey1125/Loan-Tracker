@@ -13,6 +13,7 @@ class MotorRentals extends Component
     public $motor_name = '';
     public $renter_name = '';
     public $rental_date = '';
+    public $rental_days = 1;
     public $notes = '';
     public $selectedDate = '';
     public $currentMonth = '';
@@ -31,8 +32,13 @@ class MotorRentals extends Component
             'motor_name' => ['required', 'string', 'max:255'],
             'renter_name' => ['nullable', 'string', 'max:255'],
             'rental_date' => ['required', 'date'],
+            'rental_days' => ['required', 'integer', 'min:1', 'max:30'],
             'notes' => ['nullable', 'string', 'max:1000'],
         ]);
+
+        $validated['rental_end_date'] = Carbon::parse($validated['rental_date'])
+            ->addDays(((int) $validated['rental_days']) - 1)
+            ->toDateString();
 
         if ($this->editingRentalId) {
             $rental = MotorRental::findOrFail($this->editingRentalId);
@@ -55,6 +61,7 @@ class MotorRentals extends Component
         $this->motor_name = $rental->motor_name;
         $this->renter_name = $rental->renter_name ?? '';
         $this->rental_date = $rental->rental_date->format('Y-m-d');
+        $this->rental_days = $rental->rental_days;
         $this->notes = $rental->notes ?? '';
     }
 
@@ -119,6 +126,7 @@ class MotorRentals extends Component
         $this->editingRentalId = null;
         $this->motor_name = '';
         $this->renter_name = '';
+        $this->rental_days = 1;
         $this->notes = '';
         $this->rental_date = $defaultDate;
     }
@@ -127,7 +135,9 @@ class MotorRentals extends Component
     {
         $rentals = MotorRental::query()
             ->when($this->selectedDate, function ($query): void {
-                $query->whereDate('rental_date', Carbon::parse($this->selectedDate));
+                $selectedDate = Carbon::parse($this->selectedDate)->toDateString();
+                $query->whereDate('rental_date', '<=', $selectedDate)
+                    ->whereDate('rental_end_date', '>=', $selectedDate);
             })
             ->orderBy('rental_date', 'desc')
             ->orderBy('motor_name')
@@ -136,11 +146,21 @@ class MotorRentals extends Component
         $monthStart = Carbon::parse($this->currentMonth)->startOfMonth();
         $monthEnd = $monthStart->copy()->endOfMonth();
 
-        $occupiedDates = MotorRental::query()
-            ->whereBetween('rental_date', [$monthStart->toDateString(), $monthEnd->toDateString()])
-            ->selectRaw('rental_date, COUNT(*) as rentals_count')
-            ->groupBy('rental_date')
-            ->pluck('rentals_count', 'rental_date');
+        $occupiedDates = [];
+        $monthlyRentals = MotorRental::query()
+            ->whereDate('rental_date', '<=', $monthEnd->toDateString())
+            ->whereDate('rental_end_date', '>=', $monthStart->toDateString())
+            ->get(['rental_date', 'rental_end_date']);
+
+        foreach ($monthlyRentals as $rental) {
+            $rangeStart = $rental->rental_date->copy()->max($monthStart);
+            $rangeEnd = $rental->rental_end_date->copy()->min($monthEnd);
+
+            for ($day = $rangeStart->copy(); $day->lte($rangeEnd); $day->addDay()) {
+                $date = $day->toDateString();
+                $occupiedDates[$date] = ($occupiedDates[$date] ?? 0) + 1;
+            }
+        }
 
         $gridStart = $monthStart->copy()->startOfWeek(Carbon::SUNDAY);
         $gridEnd = $monthEnd->copy()->endOfWeek(Carbon::SATURDAY);
@@ -167,6 +187,7 @@ class MotorRentals extends Component
             }),
             'calendarDays' => $calendarDays,
             'currentMonthLabel' => $monthStart->format('F Y'),
+            'selectedDateLabel' => $this->selectedDate ? Carbon::parse($this->selectedDate)->format('F d, Y') : null,
         ]);
     }
 }

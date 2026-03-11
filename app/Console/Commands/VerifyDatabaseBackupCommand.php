@@ -19,6 +19,8 @@ class VerifyDatabaseBackupCommand extends Command
             return self::FAILURE;
         }
 
+        $this->deleteInvalidBackups($backupDir);
+
         $files = collect(File::files($backupDir))->sortByDesc(fn ($file) => $file->getMTime())->values();
         if ($files->isEmpty()) {
             $this->error('No backup files found.');
@@ -36,5 +38,14 @@ class VerifyDatabaseBackupCommand extends Command
         $this->info('Latest backup verified: ' . $latest->getFilename() . ' (' . number_format($size) . ' bytes)');
 
         return self::SUCCESS;
+    }
+
+    private function deleteInvalidBackups(string $backupDir): void
+    {
+        foreach (File::files($backupDir) as $file) {
+            if ($file->getSize() <= 0) {
+                File::delete($file->getPathname());
+            }
+        }
     }
 }

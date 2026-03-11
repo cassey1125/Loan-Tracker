@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Exceptions\InsufficientFundsException;
 use App\Http\Requests\StoreLoanRequest;
 use App\Models\Borrower;
 use App\Models\Loan;
@@ -31,7 +32,7 @@ class Loans extends Component
     {
         if ($this->payment_term) {
             $startDate = $this->editingLoanId 
-                ? Loan::find($this->editingLoanId)->created_at 
+                ? Loan::findOrFail($this->editingLoanId)->created_at 
                 : now();
                 
             $this->due_date = $startDate->copy()->addMonths((int)$this->payment_term)->format('Y-m-d');
@@ -43,7 +44,7 @@ class Loans extends Component
     {
         if ($this->due_date) {
             $startDate = $this->editingLoanId 
-                ? Loan::find($this->editingLoanId)->created_at 
+                ? Loan::findOrFail($this->editingLoanId)->created_at 
                 : now();
             
             $dueDate = \Carbon\Carbon::parse($this->due_date);
@@ -76,7 +77,14 @@ class Loans extends Component
 
         $validated = $this->validate((new StoreLoanRequest())->rules());
 
-        $service->createLoan($validated);
+        try {
+            $service->createLoan($validated);
+        } catch (InsufficientFundsException $e) {
+            $this->addError('amount', $e->getMessage());
+            $this->dispatch('swal:notify', type: 'warning', message: $e->getMessage());
+
+            return;
+        }
 
         $this->reset(['borrower_id', 'amount', 'interest_rate', 'due_date', 'payment_term']);
         
@@ -89,7 +97,7 @@ class Loans extends Component
         $this->ensureCanManageFinancialRecords();
 
         $this->editingLoanId = $id;
-        $loan = Loan::find($id);
+        $loan = Loan::findOrFail($id);
         $this->borrower_id = $loan->borrower_id;
         $this->amount = $loan->amount;
         $this->interest_rate = $loan->interest_rate;
@@ -111,9 +119,16 @@ class Loans extends Component
         
         $validated = $this->validate($rules);
         
-        $loan = Loan::find($this->editingLoanId);
+        $loan = Loan::findOrFail($this->editingLoanId);
         
-        $service->updateLoan($loan, $validated);
+        try {
+            $service->updateLoan($loan, $validated);
+        } catch (InsufficientFundsException $e) {
+            $this->addError('amount', $e->getMessage());
+            $this->dispatch('swal:notify', type: 'warning', message: $e->getMessage());
+
+            return;
+        }
 
         $this->cancelEdit();
         session()->flash('message', 'Loan updated successfully.');

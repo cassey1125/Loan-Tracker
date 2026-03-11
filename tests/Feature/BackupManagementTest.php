@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Enums\UserRole;
 use App\Models\User;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\File;
 use Tests\TestCase;
@@ -53,5 +54,20 @@ class BackupManagementTest extends TestCase
             ->assertRedirect();
 
         $this->assertFalse(File::exists($backupDir . DIRECTORY_SEPARATOR . $filename));
+    }
+
+    public function test_verify_command_removes_empty_backup_files(): void
+    {
+        $backupDir = storage_path('app/backups');
+        File::ensureDirectoryExists($backupDir);
+
+        File::put($backupDir . DIRECTORY_SEPARATOR . 'empty_backup.sql', '');
+        File::put($backupDir . DIRECTORY_SEPARATOR . 'valid_backup.sql', 'not empty');
+
+        $exitCode = Artisan::call('db:backup-verify');
+
+        $this->assertSame(0, $exitCode);
+        $this->assertFalse(File::exists($backupDir . DIRECTORY_SEPARATOR . 'empty_backup.sql'));
+        $this->assertTrue(File::exists($backupDir . DIRECTORY_SEPARATOR . 'valid_backup.sql'));
     }
 }

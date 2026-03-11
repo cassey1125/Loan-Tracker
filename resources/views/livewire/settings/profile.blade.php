@@ -41,5 +41,9 @@
         </form>
 
         <livewire:settings.delete-user-form />
+
+        @if (auth()->user()?->canManageUserRoles())
+            <livewire:settings.reset-system-data-form />
+        @endif
     </x-settings.wrapper>
 </section>

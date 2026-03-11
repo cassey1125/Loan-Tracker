@@ -115,7 +115,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="10" class="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500">No loans found.</td>
+                            <td colspan="9" class="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500">No loans found.</td>
                         </tr>
                     @endforelse
                 </tbody>

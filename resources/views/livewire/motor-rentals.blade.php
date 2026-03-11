@@ -48,7 +48,7 @@
                     </div>
                     @if ($day['isOccupied'])
                         <div class="mt-1 text-[11px] font-medium text-green-700">
-                            {{ $day['rentalsCount'] }} rented
+                            {{ $day['rentalsCount'] }} active
                         </div>
                     @else
                         <div class="mt-1 text-[11px] text-gray-400">
@@ -102,6 +102,27 @@
             </div>
 
             <div>
+                <label for="rental_days" class="block text-sm font-medium text-gray-700">Rental Days</label>
+                <input
+                    type="number"
+                    id="rental_days"
+                    min="1"
+                    max="30"
+                    wire:model="rental_days"
+                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    placeholder="e.g. 4"
+                >
+                <p class="mt-1 text-xs text-gray-500">
+                    Ends on {{ 
+                        $rental_date
+                            ? \Carbon\Carbon::parse($rental_date)->addDays(max(((int) $rental_days) - 1, 0))->format('F d, Y')
+                            : '-' 
+                    }}
+                </p>
+                @error('rental_days') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+            </div>
+
+            <div>
                 <label for="notes" class="block text-sm font-medium text-gray-700">Notes (Optional)</label>
                 <input
                     type="text"
@@ -136,8 +157,8 @@
     <div class="bg-white p-6 rounded-lg shadow-md">
         <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-4">
             <div>
-                <h2 class="text-lg font-medium text-gray-900">Rented Motors by Date</h2>
-                <p class="text-sm text-gray-500">Pick a date to see motors rented on that specific date.</p>
+                <h2 class="text-lg font-medium text-gray-900">Rental Schedule</h2>
+                <p class="text-sm text-gray-500">Pick a date to see all rentals active on that day, including multi-day bookings.</p>
             </div>
 
             <div class="flex items-end gap-2">
@@ -164,8 +185,14 @@
             @forelse ($rentalsByDate as $date => $rentals)
                 <div class="border border-gray-200 rounded-md overflow-hidden">
                     <div class="bg-gray-50 px-4 py-2 text-sm font-semibold text-gray-700">
-                        {{ \Carbon\Carbon::parse($date)->format('F d, Y') }}
+                        Starts {{ \Carbon\Carbon::parse($date)->format('F d, Y') }}
                     </div>
+
+                    @if ($selectedDateLabel)
+                        <div class="px-4 py-2 text-xs text-indigo-700 bg-indigo-50 border-t border-indigo-100">
+                            Showing rentals active on {{ $selectedDateLabel }}.
+                        </div>
+                    @endif
 
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200">
@@ -173,6 +200,8 @@
                                 <tr>
                                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Motor</th>
                                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Renter</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Schedule</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Days</th>
                                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Notes</th>
                                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                                 </tr>
@@ -182,6 +211,10 @@
                                     <tr>
                                         <td class="px-4 py-2 text-sm text-gray-900">{{ $rental->motor_name }}</td>
                                         <td class="px-4 py-2 text-sm text-gray-700">{{ $rental->renter_name ?: '-' }}</td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">
+                                            {{ $rental->rental_date->format('M d') }} - {{ $rental->rental_end_date->format('M d, Y') }}
+                                        </td>
+                                        <td class="px-4 py-2 text-sm text-gray-700">{{ $rental->duration_label }}</td>
                                         <td class="px-4 py-2 text-sm text-gray-700">{{ $rental->notes ?: '-' }}</td>
                                         <td class="px-4 py-2 text-sm">
                                             <button

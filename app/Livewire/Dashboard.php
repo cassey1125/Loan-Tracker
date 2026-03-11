@@ -3,12 +3,12 @@
 namespace App\Livewire;
 
 use App\Models\Fund;
-use App\Models\Investor;
 use App\Models\Loan;
 use App\Models\MotorRental;
 use App\Models\Payment;
 use App\Enums\LoanStatus;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 
@@ -38,20 +38,26 @@ class Dashboard extends Component
 
     public function render()
     {
+        set_time_limit(120);
+
         // 1. Lending Dashboard Stats
-        $loans = Loan::all();
-        $totalLent = $loans->sum('amount');
-        
-        $totalExpected = Loan::sum('total_payable');
-        $totalRemaining = Loan::sum('remaining_balance');
+        $loanTotals = Loan::query()
+            ->selectRaw('COALESCE(SUM(amount), 0) as total_lent')
+            ->selectRaw('COALESCE(SUM(total_payable), 0) as total_expected')
+            ->selectRaw('COALESCE(SUM(remaining_balance), 0) as total_remaining')
+            ->first();
+
+        $totalLent = (float) ($loanTotals?->total_lent ?? 0);
+        $totalExpected = (float) ($loanTotals?->total_expected ?? 0);
+        $totalRemaining = (float) ($loanTotals?->total_remaining ?? 0);
         $totalCollected = $totalExpected - $totalRemaining;
-        
-        $paidLoansAmount = Loan::where('status', LoanStatus::PAID)->sum('total_payable');
+
         $notYetPaidAmount = Loan::where('status', '!=', LoanStatus::PAID)->sum('remaining_balance');
         
         // Investor Earnings (Jo & Rob)
-        $earningsJo = $loans->sum(fn (Loan $loan) => $loan->investor1_interest);
-        $earningsRob = $loans->sum(fn (Loan $loan) => $loan->investor2_interest);
+        $earnings = $this->calculateInvestorEarnings();
+        $earningsJo = $earnings['jo'];
+        $earningsRob = $earnings['rob'];
 
         $totalProfit = $earningsJo + $earningsRob;
 
@@ -85,29 +91,7 @@ class Dashboard extends Component
         // Line Chart Data (Monthly)
         // Cash In (Payments), Total Lent (Loans Created)
         // We need to group by month.
-        $months = [];
-        $cashInData = [];
-        $lentData = [];
-        
-        // Last 6 months
-        for ($i = 5; $i >= 0; $i--) {
-            $date = Carbon::now()->subMonths($i);
-            $monthName = $date->format('M');
-            $months[] = $monthName;
-            
-            $startOfMonth = $date->copy()->startOfMonth();
-            $endOfMonth = $date->copy()->endOfMonth();
-            
-            // Total Lent
-            $lent = Loan::whereBetween('created_at', [$startOfMonth, $endOfMonth])->sum('amount');
-            $lentData[] = $lent;
-            
-            // Cash In (Funds Deposits) - Use Fund model to track deposits
-            $cashIn = Fund::where('type', 'deposit')
-                ->whereBetween('date', [$startOfMonth, $endOfMonth])
-                ->sum('amount');
-            $cashInData[] = $cashIn;
-        }
+        [$months, $lentData, $cashInData] = $this->monthlyInsights();
 
         // Recent activity feed
         $recentLoanActivities = Loan::with('borrower')
@@ -187,7 +171,6 @@ class Dashboard extends Component
         }
 
         return view('livewire.dashboard', [
-            'investors' => Investor::all(), // Kept for other potential uses if any, or can be removed
             'totalLent' => $totalLent,
             'totalCollected' => $totalCollected,
             'totalExpected' => $totalExpected,
@@ -201,5 +184,89 @@ class Dashboard extends Component
             'insightsCleared' => $this->insightsCleared,
             'recentActivities' => $recentActivities,
         ]);
+    }
+
+    /**
+     * @return array{jo: float, rob: float}
+     */
+    private function calculateInvestorEarnings(): array
+    {
+        return Cache::remember('dashboard:investor-earnings:v1', now()->addSeconds(20), function (): array {
+            $joExpression = "COALESCE(SUM(CASE ROUND(interest_rate) "
+                . "WHEN 5 THEN amount * 0.04 * payment_term "
+                . "WHEN 7 THEN amount * 0.05 * payment_term "
+                . "WHEN 10 THEN amount * 0.07 * payment_term "
+                . "ELSE 0 END), 0) as jo_total";
+
+            $robExpression = "COALESCE(SUM(CASE ROUND(interest_rate) "
+                . "WHEN 5 THEN amount * 0.01 * payment_term "
+                . "WHEN 7 THEN amount * 0.02 * payment_term "
+                . "WHEN 10 THEN amount * 0.03 * payment_term "
+                . "ELSE 0 END), 0) as rob_total";
+
+            $totals = Loan::query()
+                ->selectRaw($joExpression)
+                ->selectRaw($robExpression)
+                ->first();
+
+            $jo = (float) ($totals?->jo_total ?? 0);
+            $rob = (float) ($totals?->rob_total ?? 0);
+
+            return [
+                'jo' => round($jo, 2),
+                'rob' => round($rob, 2),
+            ];
+        });
+    }
+
+    /**
+     * @return array{0: array<int, string>, 1: array<int, float>, 2: array<int, float>}
+     */
+    private function monthlyInsights(): array
+    {
+        return Cache::remember('dashboard:monthly-insights:v1', now()->addSeconds(20), function (): array {
+            $driver = DB::connection()->getDriverName();
+            $loanMonthExpr = $driver === 'sqlite'
+                ? "strftime('%Y-%m', created_at)"
+                : "DATE_FORMAT(created_at, '%Y-%m')";
+            $fundMonthExpr = $driver === 'sqlite'
+                ? "strftime('%Y-%m', date)"
+                : "DATE_FORMAT(date, '%Y-%m')";
+
+            $monthOrder = [];
+            $months = [];
+            for ($i = 5; $i >= 0; $i--) {
+                $date = Carbon::now()->subMonths($i);
+                $key = $date->format('Y-m');
+                $monthOrder[] = $key;
+                $months[] = $date->format('M');
+            }
+
+            $start = Carbon::createFromFormat('Y-m', $monthOrder[0])->startOfMonth();
+            $end = Carbon::createFromFormat('Y-m', $monthOrder[count($monthOrder) - 1])->endOfMonth();
+
+            $lentByMonth = Loan::query()
+                ->selectRaw($loanMonthExpr." as month_key, SUM(amount) as total")
+                ->whereBetween('created_at', [$start, $end])
+                ->groupBy('month_key')
+                ->pluck('total', 'month_key');
+
+            $cashInByMonth = Fund::query()
+                ->selectRaw($fundMonthExpr." as month_key, SUM(amount) as total")
+                ->where('type', 'deposit')
+                ->whereBetween('date', [$start->toDateString(), $end->toDateString()])
+                ->groupBy('month_key')
+                ->pluck('total', 'month_key');
+
+            $lentData = [];
+            $cashInData = [];
+
+            foreach ($monthOrder as $key) {
+                $lentData[] = (float) ($lentByMonth[$key] ?? 0);
+                $cashInData[] = (float) ($cashInByMonth[$key] ?? 0);
+            }
+
+            return [$months, $lentData, $cashInData];
+        });
     }
 }

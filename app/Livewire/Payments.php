@@ -50,7 +50,7 @@ class Payments extends Component
         $this->ensureCanManageFinancialRecords();
 
         $this->editingPaymentId = $id;
-        $payment = Payment::find($id);
+        $payment = Payment::findOrFail($id);
         $this->loan_id = $payment->loan_id;
         $this->amount = $payment->amount;
         $this->payment_method = $payment->payment_method;

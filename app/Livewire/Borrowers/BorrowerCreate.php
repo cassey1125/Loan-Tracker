@@ -14,6 +14,11 @@ class BorrowerCreate extends Component
 
     public function save(BorrowerService $service)
     {
+        $user = auth()->user();
+        if (!$user || !$user->canManageFinancialRecords()) {
+            abort(403, 'Only owner/admin can create borrowers.');
+        }
+
         $validated = $this->validate((new StoreBorrowerRequest())->rules());
 
         $service->createBorrower($validated);

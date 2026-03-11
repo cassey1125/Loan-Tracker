@@ -124,7 +124,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500">No payments recorded yet.</td>
+                            <td colspan="8" class="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500">No payments recorded yet.</td>
                         </tr>
                     @endforelse
                 </tbody>

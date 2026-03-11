@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Enums\LoanStatus;
 use App\Models\Borrower;
+use App\Models\Fund;
 use App\Models\Loan;
 use App\Models\Payment;
 use App\Services\Loan\LoanService;
@@ -70,6 +71,13 @@ class FinancialIntegrityTest extends TestCase
     {
         $borrower = Borrower::factory()->create();
 
+        Fund::create([
+            'date' => now()->toDateString(),
+            'amount' => 2000,
+            'type' => 'deposit',
+            'description' => 'Initial capital for loan integrity test',
+        ]);
+
         $loan = app(LoanService::class)->createLoan([
             'borrower_id' => $borrower->id,
             'amount' => 1000,
@@ -104,6 +112,13 @@ class FinancialIntegrityTest extends TestCase
     public function test_soft_deleting_payment_restores_loan_balance_and_removes_linked_entries(): void
     {
         $borrower = Borrower::factory()->create();
+
+        Fund::create([
+            'date' => now()->toDateString(),
+            'amount' => 1500,
+            'type' => 'deposit',
+            'description' => 'Initial capital for payment deletion integrity test',
+        ]);
 
         $loan = app(LoanService::class)->createLoan([
             'borrower_id' => $borrower->id,

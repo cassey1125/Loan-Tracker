@@ -23,6 +23,11 @@ class BorrowerEdit extends Component
 
     public function update(BorrowerService $service)
     {
+        $user = auth()->user();
+        if (!$user || !$user->canManageFinancialRecords()) {
+            abort(403, 'Only owner/admin can edit borrowers.');
+        }
+
         // Manual validation for simplicity in Livewire context
         $validated = $this->validate([
             'first_name' => ['required', 'string', 'max:255'],
