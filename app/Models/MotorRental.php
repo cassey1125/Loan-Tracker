@@ -24,8 +24,15 @@ class MotorRental extends Model
         'rental_days' => 'integer',
     ];
 
+    public function getEffectiveRentalEndDateAttribute()
+    {
+        return $this->rental_end_date ?? $this->rental_date;
+    }
+
     public function getDurationLabelAttribute(): string
     {
-        return $this->rental_days === 1 ? '1 day' : $this->rental_days . ' days';
+        $days = max(1, (int) ($this->rental_days ?? 1));
+
+        return $days === 1 ? '1 day' : $days . ' days';
     }
 }

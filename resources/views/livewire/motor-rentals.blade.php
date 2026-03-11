@@ -159,6 +159,9 @@
             <div>
                 <h2 class="text-lg font-medium text-gray-900">Rental Schedule</h2>
                 <p class="text-sm text-gray-500">Pick a date to see all rentals active on that day, including multi-day bookings.</p>
+                @unless($hasDurationColumns)
+                    <p class="text-xs text-amber-600 mt-1">Duration columns are not yet migrated in this environment. Showing single-day schedule mode until migration runs.</p>
+                @endunless
             </div>
 
             <div class="flex items-end gap-2">
@@ -212,7 +215,7 @@
                                         <td class="px-4 py-2 text-sm text-gray-900">{{ $rental->motor_name }}</td>
                                         <td class="px-4 py-2 text-sm text-gray-700">{{ $rental->renter_name ?: '-' }}</td>
                                         <td class="px-4 py-2 text-sm text-gray-700">
-                                            {{ $rental->rental_date->format('M d') }} - {{ $rental->rental_end_date->format('M d, Y') }}
+                                            {{ $rental->rental_date->format('M d') }} - {{ $rental->effective_rental_end_date->format('M d, Y') }}
                                         </td>
                                         <td class="px-4 py-2 text-sm text-gray-700">{{ $rental->duration_label }}</td>
                                         <td class="px-4 py-2 text-sm text-gray-700">{{ $rental->notes ?: '-' }}</td>

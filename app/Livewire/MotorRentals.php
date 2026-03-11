@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Models\MotorRental;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Schema;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
@@ -17,6 +18,7 @@ class MotorRentals extends Component
     public $notes = '';
     public $selectedDate = '';
     public $currentMonth = '';
+    private ?bool $hasDurationColumns = null;
 
     public function mount(): void
     {
@@ -36,16 +38,26 @@ class MotorRentals extends Component
             'notes' => ['nullable', 'string', 'max:1000'],
         ]);
 
-        $validated['rental_end_date'] = Carbon::parse($validated['rental_date'])
-            ->addDays(((int) $validated['rental_days']) - 1)
-            ->toDateString();
+        $payload = [
+            'motor_name' => $validated['motor_name'],
+            'renter_name' => $validated['renter_name'] ?? null,
+            'rental_date' => $validated['rental_date'],
+            'notes' => $validated['notes'] ?? null,
+        ];
+
+        if ($this->durationColumnsAvailable()) {
+            $payload['rental_days'] = (int) $validated['rental_days'];
+            $payload['rental_end_date'] = Carbon::parse($validated['rental_date'])
+                ->addDays(((int) $validated['rental_days']) - 1)
+                ->toDateString();
+        }
 
         if ($this->editingRentalId) {
             $rental = MotorRental::findOrFail($this->editingRentalId);
-            $rental->update($validated);
+            $rental->update($payload);
             $this->dispatch('swal:notify', type: 'success', message: 'Motor rental updated.');
         } else {
-            MotorRental::create($validated);
+            MotorRental::create($payload);
             $this->dispatch('swal:notify', type: 'success', message: 'Motor rental added.');
         }
 
@@ -61,7 +73,7 @@ class MotorRentals extends Component
         $this->motor_name = $rental->motor_name;
         $this->renter_name = $rental->renter_name ?? '';
         $this->rental_date = $rental->rental_date->format('Y-m-d');
-        $this->rental_days = $rental->rental_days;
+        $this->rental_days = (int) ($rental->rental_days ?? 1);
         $this->notes = $rental->notes ?? '';
     }
 
@@ -133,11 +145,20 @@ class MotorRentals extends Component
 
     public function render()
     {
+        $hasDurationColumns = $this->durationColumnsAvailable();
+
         $rentals = MotorRental::query()
-            ->when($this->selectedDate, function ($query): void {
+            ->when($this->selectedDate, function ($query) use ($hasDurationColumns): void {
                 $selectedDate = Carbon::parse($this->selectedDate)->toDateString();
-                $query->whereDate('rental_date', '<=', $selectedDate)
-                    ->whereDate('rental_end_date', '>=', $selectedDate);
+
+                if ($hasDurationColumns) {
+                    $query->whereDate('rental_date', '<=', $selectedDate)
+                        ->whereDate('rental_end_date', '>=', $selectedDate);
+
+                    return;
+                }
+
+                $query->whereDate('rental_date', '=', $selectedDate);
             })
             ->orderBy('rental_date', 'desc')
             ->orderBy('motor_name')
@@ -147,14 +168,21 @@ class MotorRentals extends Component
         $monthEnd = $monthStart->copy()->endOfMonth();
 
         $occupiedDates = [];
-        $monthlyRentals = MotorRental::query()
-            ->whereDate('rental_date', '<=', $monthEnd->toDateString())
-            ->whereDate('rental_end_date', '>=', $monthStart->toDateString())
-            ->get(['rental_date', 'rental_end_date']);
+        $monthlyRentals = MotorRental::query();
+        if ($hasDurationColumns) {
+            $monthlyRentals = $monthlyRentals
+                ->whereDate('rental_date', '<=', $monthEnd->toDateString())
+                ->whereDate('rental_end_date', '>=', $monthStart->toDateString())
+                ->get(['rental_date', 'rental_end_date']);
+        } else {
+            $monthlyRentals = $monthlyRentals
+                ->whereBetween('rental_date', [$monthStart->toDateString(), $monthEnd->toDateString()])
+                ->get(['rental_date']);
+        }
 
         foreach ($monthlyRentals as $rental) {
             $rangeStart = $rental->rental_date->copy()->max($monthStart);
-            $rangeEnd = $rental->rental_end_date->copy()->min($monthEnd);
+            $rangeEnd = ($rental->rental_end_date ?? $rental->rental_date)->copy()->min($monthEnd);
 
             for ($day = $rangeStart->copy(); $day->lte($rangeEnd); $day->addDay()) {
                 $date = $day->toDateString();
@@ -188,6 +216,18 @@ class MotorRentals extends Component
             'calendarDays' => $calendarDays,
             'currentMonthLabel' => $monthStart->format('F Y'),
             'selectedDateLabel' => $this->selectedDate ? Carbon::parse($this->selectedDate)->format('F d, Y') : null,
+            'hasDurationColumns' => $hasDurationColumns,
         ]);
+    }
+
+    private function durationColumnsAvailable(): bool
+    {
+        if ($this->hasDurationColumns !== null) {
+            return $this->hasDurationColumns;
+        }
+
+        $this->hasDurationColumns = Schema::hasColumns('motor_rentals', ['rental_days', 'rental_end_date']);
+
+        return $this->hasDurationColumns;
     }
 }
