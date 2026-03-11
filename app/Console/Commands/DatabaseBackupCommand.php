@@ -15,8 +15,7 @@ class DatabaseBackupCommand extends Command
 
     public function handle(): int
     {
-        $defaultConnection = config('database.default');
-        $config = config("database.connections.{$defaultConnection}");
+        $config = $this->getConnectionConfig();
 
         $backupDir = storage_path('app/backups');
         File::ensureDirectoryExists($backupDir);
@@ -67,7 +66,14 @@ class DatabaseBackupCommand extends Command
             ]);
 
             if (!$mysqldump) {
-                $this->error('MySQL backup failed: mysqldump executable not found.');
+                $fallbackError = $this->createMySqlFallbackBackup($target);
+                if ($fallbackError === null) {
+                    $this->info("MySQL backup created: {$target}");
+                    $this->pruneOldBackups($backupDir, (int) $this->option('retention'));
+                    return self::SUCCESS;
+                }
+
+                $this->error('MySQL backup failed: mysqldump executable not found. Fallback export failed: ' . $fallbackError);
                 return self::FAILURE;
             }
 
@@ -114,7 +120,14 @@ class DatabaseBackupCommand extends Command
         return self::FAILURE;
     }
 
-    private function pruneOldBackups(string $backupDir, int $retentionDays): void
+    protected function getConnectionConfig(): array
+    {
+        $defaultConnection = config('database.default');
+
+        return (array) config("database.connections.{$defaultConnection}", []);
+    }
+
+    protected function pruneOldBackups(string $backupDir, int $retentionDays): void
     {
         $files = File::files($backupDir);
         $threshold = now()->subDays($retentionDays)->getTimestamp();
@@ -126,7 +139,7 @@ class DatabaseBackupCommand extends Command
         }
     }
 
-    private function deleteInvalidBackups(string $backupDir): void
+    protected function deleteInvalidBackups(string $backupDir): void
     {
         foreach (File::files($backupDir) as $file) {
             if ($file->getSize() <= 0) {
@@ -135,7 +148,7 @@ class DatabaseBackupCommand extends Command
         }
     }
 
-    private function resolveBinaryPath(string $envKey, array $candidates): ?string
+    protected function resolveBinaryPath(string $envKey, array $candidates): ?string
     {
         $configured = env($envKey);
         if (is_string($configured) && $configured !== '' && File::exists($configured)) {
@@ -163,7 +176,7 @@ class DatabaseBackupCommand extends Command
         return null;
     }
 
-    private function createMySqlFallbackBackup(string $target): ?string
+    protected function createMySqlFallbackBackup(string $target): ?string
     {
         try {
             $connection = DB::connection();
@@ -225,7 +238,7 @@ class DatabaseBackupCommand extends Command
         }
     }
 
-    private function sqlLiteral(\PDO $pdo, mixed $value): string
+    protected function sqlLiteral(\PDO $pdo, mixed $value): string
     {
         if ($value === null) {
             return 'NULL';
