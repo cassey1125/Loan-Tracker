@@ -5,6 +5,7 @@ namespace App\Livewire\Borrowers;
 use App\Http\Requests\StoreBorrowerRequest;
 use App\Services\Borrower\BorrowerService;
 use Livewire\Component;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class BorrowerCreate extends Component
 {
@@ -14,10 +15,7 @@ class BorrowerCreate extends Component
 
     public function save(BorrowerService $service)
     {
-        $user = auth()->user();
-        if (!$user || !$user->canManageFinancialRecords()) {
-            abort(403, 'Only owner/admin can create borrowers.');
-        }
+        $this->ensureCanManageFinancialRecords();
 
         $validated = $this->validate((new StoreBorrowerRequest())->rules());
 
@@ -31,5 +29,13 @@ class BorrowerCreate extends Component
     public function render()
     {
         return view('livewire.borrowers.borrower-create');
+    }
+
+    private function ensureCanManageFinancialRecords(): void
+    {
+        $user = auth()->user();
+        if (!$user || !$user->canManageFinancialRecords()) {
+            throw new HttpException(403, 'Only owner/admin can create borrowers.');
+        }
     }
 }

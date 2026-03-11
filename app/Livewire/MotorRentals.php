@@ -7,6 +7,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Schema;
 use Livewire\Attributes\On;
 use Livewire\Component;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class MotorRentals extends Component
 {
@@ -30,6 +31,8 @@ class MotorRentals extends Component
 
     public function saveRental(): void
     {
+        $this->ensureCanManageFinancialRecords();
+
         $validated = $this->validate([
             'motor_name' => ['required', 'string', 'max:255'],
             'renter_name' => ['nullable', 'string', 'max:255'],
@@ -67,6 +70,8 @@ class MotorRentals extends Component
 
     public function editRental(int $id): void
     {
+        $this->ensureCanManageFinancialRecords();
+
         $rental = MotorRental::findOrFail($id);
 
         $this->editingRentalId = $rental->id;
@@ -84,12 +89,16 @@ class MotorRentals extends Component
 
     public function requestDelete(int $id): void
     {
+        $this->ensureCanManageFinancialRecords();
+
         $this->dispatch('swal:confirm-delete', id: $id);
     }
 
     #[On('motor-rental-delete-confirmed')]
     public function deleteRentalConfirmed(int $id): void
     {
+        $this->ensureCanManageFinancialRecords();
+
         $rental = MotorRental::find($id);
 
         if (! $rental) {
@@ -141,6 +150,14 @@ class MotorRentals extends Component
         $this->rental_days = 1;
         $this->notes = '';
         $this->rental_date = $defaultDate;
+    }
+
+    private function ensureCanManageFinancialRecords(): void
+    {
+        $user = auth()->user();
+        if (!$user || !$user->canManageFinancialRecords()) {
+            throw new HttpException(403, 'Only owner/admin can modify motor rentals.');
+        }
     }
 
     public function render()

@@ -43,7 +43,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     
     Route::get('borrowers/create', function () {
         return view('borrowers.create');
-    })->name('borrowers.create');
+    })->middleware('role:owner,admin')->name('borrowers.create');
 
     Route::get('borrowers/{borrower}', function (App\Models\Borrower $borrower) {
         return view('borrowers.show', compact('borrower'));
@@ -51,7 +51,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('borrowers/{borrower}/edit', function (App\Models\Borrower $borrower) {
         return view('borrowers.edit', compact('borrower'));
-    })->name('borrowers.edit');
+    })->middleware('role:owner,admin')->name('borrowers.edit');
 
     Route::get('borrowers/{borrower}/profit', function (App\Models\Borrower $borrower) {
         return view('borrowers.profit', compact('borrower'));

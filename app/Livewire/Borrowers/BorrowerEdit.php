@@ -5,6 +5,7 @@ namespace App\Livewire\Borrowers;
 use App\Services\Borrower\BorrowerService;
 use App\Models\Borrower;
 use Livewire\Component;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class BorrowerEdit extends Component
 {
@@ -23,10 +24,7 @@ class BorrowerEdit extends Component
 
     public function update(BorrowerService $service)
     {
-        $user = auth()->user();
-        if (!$user || !$user->canManageFinancialRecords()) {
-            abort(403, 'Only owner/admin can edit borrowers.');
-        }
+        $this->ensureCanManageFinancialRecords();
 
         // Manual validation for simplicity in Livewire context
         $validated = $this->validate([
@@ -45,5 +43,13 @@ class BorrowerEdit extends Component
     public function render()
     {
         return view('livewire.borrowers.borrower-edit');
+    }
+
+    private function ensureCanManageFinancialRecords(): void
+    {
+        $user = auth()->user();
+        if (!$user || !$user->canManageFinancialRecords()) {
+            throw new HttpException(403, 'Only owner/admin can edit borrowers.');
+        }
     }
 }

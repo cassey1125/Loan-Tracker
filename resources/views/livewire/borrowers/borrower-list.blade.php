@@ -1,9 +1,11 @@
 <div class="space-y-6">
     <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
         <h2 class="text-xl font-semibold text-gray-800">Borrowers</h2>
-        <a href="{{ route('borrowers.create') }}" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-            Add New Borrower
-        </a>
+        @if(auth()->user()?->canManageFinancialRecords())
+            <a href="{{ route('borrowers.create') }}" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                Add New Borrower
+            </a>
+        @endif
     </div>
 
     <!-- Filters and Search -->
@@ -47,8 +49,12 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                 <a href="{{ route('borrowers.show', $borrower) }}" class="text-indigo-600 hover:text-indigo-900 mr-3">View</a>
-                                <a href="{{ route('borrowers.edit', $borrower) }}" class="text-gray-600 hover:text-gray-900 mr-3">Edit</a>
-                                <button wire:click="delete({{ $borrower->id }})" wire:confirm="Are you sure you want to delete this borrower?" class="text-red-600 hover:text-red-900">Delete</button>
+                                @if(auth()->user()?->canManageFinancialRecords())
+                                    <a href="{{ route('borrowers.edit', $borrower) }}" class="text-gray-600 hover:text-gray-900 mr-3">Edit</a>
+                                    <button wire:click="delete({{ $borrower->id }})" wire:confirm="Are you sure you want to delete this borrower?" class="text-red-600 hover:text-red-900">Delete</button>
+                                @else
+                                    <span class="text-xs text-gray-400">View only</span>
+                                @endif
                             </td>
                         </tr>
                     @empty

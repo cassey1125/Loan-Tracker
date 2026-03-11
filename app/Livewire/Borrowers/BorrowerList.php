@@ -8,6 +8,7 @@ use App\Services\Borrower\BorrowerService;
 use Illuminate\Validation\ValidationException;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class BorrowerList extends Component
 {
@@ -27,11 +28,7 @@ class BorrowerList extends Component
 
     public function delete(BorrowerService $service, $id)
     {
-        $user = auth()->user();
-        if (!$user || !$user->canManageFinancialRecords()) {
-            $this->dispatch('swal:notify', type: 'error', message: 'Only owner/admin can delete borrowers.');
-            return;
-        }
+        $this->ensureCanManageFinancialRecords();
 
         $borrower = Borrower::findOrFail($id);
 
@@ -77,5 +74,13 @@ class BorrowerList extends Component
                 $this->sortDirection
             ),
         ]);
+    }
+
+    private function ensureCanManageFinancialRecords(): void
+    {
+        $user = auth()->user();
+        if (!$user || !$user->canManageFinancialRecords()) {
+            throw new HttpException(403, 'Only owner/admin can delete borrowers.');
+        }
     }
 }

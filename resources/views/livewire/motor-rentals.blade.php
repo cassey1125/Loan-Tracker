@@ -60,99 +60,101 @@
         </div>
     </div>
 
-    <div class="bg-white p-6 rounded-lg shadow-md">
-        <h2 class="text-lg font-medium text-gray-900 mb-4">
-            {{ $editingRentalId ? 'Edit Motor Rental' : 'Add Motor Rental' }}
-        </h2>
+    @if(auth()->user()?->canManageFinancialRecords())
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h2 class="text-lg font-medium text-gray-900 mb-4">
+                {{ $editingRentalId ? 'Edit Motor Rental' : 'Add Motor Rental' }}
+            </h2>
 
-        <form wire:submit.prevent="saveRental" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-                <label for="motor_name" class="block text-sm font-medium text-gray-700">Motor Name / Unit</label>
-                <input
-                    type="text"
-                    id="motor_name"
-                    wire:model="motor_name"
-                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                    placeholder="e.g. Mio 125 - Unit 04"
-                >
-                @error('motor_name') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
-            </div>
-
-            <div>
-                <label for="renter_name" class="block text-sm font-medium text-gray-700">Renter Name (Optional)</label>
-                <input
-                    type="text"
-                    id="renter_name"
-                    wire:model="renter_name"
-                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                    placeholder="e.g. Juan Dela Cruz"
-                >
-                @error('renter_name') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
-            </div>
-
-            <div>
-                <label for="rental_date" class="block text-sm font-medium text-gray-700">Rental Date</label>
-                <input
-                    type="date"
-                    id="rental_date"
-                    wire:model="rental_date"
-                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                >
-                @error('rental_date') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
-            </div>
-
-            <div>
-                <label for="rental_days" class="block text-sm font-medium text-gray-700">Rental Days</label>
-                <input
-                    type="number"
-                    id="rental_days"
-                    min="1"
-                    max="30"
-                    wire:model="rental_days"
-                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                    placeholder="e.g. 4"
-                >
-                <p class="mt-1 text-xs text-gray-500">
-                    Ends on {{ 
-                        $rental_date
-                            ? \Carbon\Carbon::parse($rental_date)->addDays(max(((int) $rental_days) - 1, 0))->format('F d, Y')
-                            : '-' 
-                    }}
-                </p>
-                @error('rental_days') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
-            </div>
-
-            <div>
-                <label for="notes" class="block text-sm font-medium text-gray-700">Notes (Optional)</label>
-                <input
-                    type="text"
-                    id="notes"
-                    wire:model="notes"
-                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                    placeholder="Any extra details"
-                >
-                @error('notes') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
-            </div>
-
-            <div class="md:col-span-2">
-                <button
-                    type="submit"
-                    class="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700"
-                >
-                    {{ $editingRentalId ? 'Update Rental' : 'Save Rental' }}
-                </button>
-                @if ($editingRentalId)
-                    <button
-                        type="button"
-                        wire:click="cancelEdit"
-                        class="ml-2 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
+            <form wire:submit.prevent="saveRental" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label for="motor_name" class="block text-sm font-medium text-gray-700">Motor Name / Unit</label>
+                    <input
+                        type="text"
+                        id="motor_name"
+                        wire:model="motor_name"
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                        placeholder="e.g. Mio 125 - Unit 04"
                     >
-                        Cancel
+                    @error('motor_name') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                </div>
+
+                <div>
+                    <label for="renter_name" class="block text-sm font-medium text-gray-700">Renter Name (Optional)</label>
+                    <input
+                        type="text"
+                        id="renter_name"
+                        wire:model="renter_name"
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                        placeholder="e.g. Juan Dela Cruz"
+                    >
+                    @error('renter_name') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                </div>
+
+                <div>
+                    <label for="rental_date" class="block text-sm font-medium text-gray-700">Rental Date</label>
+                    <input
+                        type="date"
+                        id="rental_date"
+                        wire:model="rental_date"
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    >
+                    @error('rental_date') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                </div>
+
+                <div>
+                    <label for="rental_days" class="block text-sm font-medium text-gray-700">Rental Days</label>
+                    <input
+                        type="number"
+                        id="rental_days"
+                        min="1"
+                        max="30"
+                        wire:model="rental_days"
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                        placeholder="e.g. 4"
+                    >
+                    <p class="mt-1 text-xs text-gray-500">
+                        Ends on {{ 
+                            $rental_date
+                                ? \Carbon\Carbon::parse($rental_date)->addDays(max(((int) $rental_days) - 1, 0))->format('F d, Y')
+                                : '-' 
+                        }}
+                    </p>
+                    @error('rental_days') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                </div>
+
+                <div>
+                    <label for="notes" class="block text-sm font-medium text-gray-700">Notes (Optional)</label>
+                    <input
+                        type="text"
+                        id="notes"
+                        wire:model="notes"
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                        placeholder="Any extra details"
+                    >
+                    @error('notes') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                </div>
+
+                <div class="md:col-span-2">
+                    <button
+                        type="submit"
+                        class="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700"
+                    >
+                        {{ $editingRentalId ? 'Update Rental' : 'Save Rental' }}
                     </button>
-                @endif
-            </div>
-        </form>
-    </div>
+                    @if ($editingRentalId)
+                        <button
+                            type="button"
+                            wire:click="cancelEdit"
+                            class="ml-2 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
+                        >
+                            Cancel
+                        </button>
+                    @endif
+                </div>
+            </form>
+        </div>
+    @endif
 
     <div class="bg-white p-6 rounded-lg shadow-md">
         <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-4">
@@ -220,20 +222,24 @@
                                         <td class="px-4 py-2 text-sm text-gray-700">{{ $rental->duration_label }}</td>
                                         <td class="px-4 py-2 text-sm text-gray-700">{{ $rental->notes ?: '-' }}</td>
                                         <td class="px-4 py-2 text-sm">
-                                            <button
-                                                type="button"
-                                                wire:click="editRental({{ $rental->id }})"
-                                                class="text-indigo-600 hover:text-indigo-800 font-medium"
-                                            >
-                                                Edit
-                                            </button>
-                                            <button
-                                                type="button"
-                                                wire:click="requestDelete({{ $rental->id }})"
-                                                class="ml-3 text-red-600 hover:text-red-800 font-medium"
-                                            >
-                                                Delete
-                                            </button>
+                                            @if(auth()->user()?->canManageFinancialRecords())
+                                                <button
+                                                    type="button"
+                                                    wire:click="editRental({{ $rental->id }})"
+                                                    class="text-indigo-600 hover:text-indigo-800 font-medium"
+                                                >
+                                                    Edit
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    wire:click="requestDelete({{ $rental->id }})"
+                                                    class="ml-3 text-red-600 hover:text-red-800 font-medium"
+                                                >
+                                                    Delete
+                                                </button>
+                                            @else
+                                                <span class="text-xs text-gray-400">View only</span>
+                                            @endif
                                         </td>
                                     </tr>
                                 @endforeach
