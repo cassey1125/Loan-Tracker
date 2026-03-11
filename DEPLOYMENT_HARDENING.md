@@ -1,5 +1,29 @@
 # Deployment Hardening Checklist
 
+## System Architecture
+
+```mermaid
+flowchart TD
+    subgraph Presentation["Presentation Layer"]
+        A[Blade Templates] --> B[Livewire Components]
+        B --> C[Tailwind CSS / UI]
+    end
+    subgraph Application["Application Layer"]
+        D[Laravel Router] --> E[Controllers / Livewire]
+        E --> F[Services / Repositories]
+    end
+    subgraph Data["Data Layer"]
+        G[Eloquent ORM] --> H[(MySQL Database)]
+    end
+
+    C -->|HTTP Request| D
+    F -->|Query / Persist| G
+    H -->|Result Set| G
+    G -->|Model Objects| F
+    F -->|Data| E
+    E -->|View Data| B
+```
+
 ## 1) Run migrations
 
 ```bash
