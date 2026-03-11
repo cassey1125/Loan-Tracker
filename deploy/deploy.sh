@@ -31,7 +31,6 @@ echo "[6/10] Clearing old caches..."
 
 echo "[7/10] Caching production config..."
 "$PHP_BIN" artisan config:cache
-"$PHP_BIN" artisan route:cache
 "$PHP_BIN" artisan view:cache
 
 echo "[8/10] Restarting queue workers..."

@@ -40,14 +40,17 @@ DB_URL=${{MySQL.MYSQL_URL}}
 5. Set `Pre-Deploy Command`:
 
 ```bash
-php artisan migrate --force
+php artisan migrate --force && php artisan config:cache && php artisan view:cache
 ```
 
 6. Set `Start Command`:
 
 ```bash
-php artisan serve --host=0.0.0.0 --port=$PORT
+sh ./deploy/boot-web.sh
 ```
+
+Note:
+- Do not enable `route:cache` for this project while route closures are present in `routes/web.php`.
 
 7. Click `Deploy` (or trigger redeploy from latest commit).
 
