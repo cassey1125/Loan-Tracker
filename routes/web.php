@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\IntegrityCheckController;
 use App\Http\Controllers\BackupManagementController;
+use App\Http\Controllers\BorrowerIdDocumentController;
 use App\Http\Controllers\RoleManagementController;
 
 use App\Livewire\Borrowers\BorrowerCreate;
@@ -48,6 +49,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('borrowers/{borrower}', function (App\Models\Borrower $borrower) {
         return view('borrowers.show', compact('borrower'));
     })->name('borrowers.show');
+
+    Route::get('borrowers/{borrower}/id-document', BorrowerIdDocumentController::class)
+        ->middleware('role:owner,admin')
+        ->name('borrowers.id-document.download');
 
     Route::get('borrowers/{borrower}/edit', function (App\Models\Borrower $borrower) {
         return view('borrowers.edit', compact('borrower'));

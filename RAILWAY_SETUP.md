@@ -110,3 +110,11 @@ sh -lc 'while true; do php artisan schedule:run --no-interaction; sleep 60; done
 ## 8. Optional Persistent Backup Storage
 
 If you rely on `storage/app/backups`, attach a volume to the service that writes backups, or switch backups to external storage.
+
+## 9. Borrower ID Upload Storage
+
+Borrower ID files are stored on the disk configured by `BORROWER_ID_DISK`.
+
+- Default: `local` using Laravel private storage.
+- For Railway production, attach a persistent volume if you keep `BORROWER_ID_DISK=local` so uploaded IDs survive redeploys.
+- If you use object storage instead, set `BORROWER_ID_DISK=s3` and provide the standard `AWS_*` variables already supported by Laravel.

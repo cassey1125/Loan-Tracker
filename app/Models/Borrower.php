@@ -16,6 +16,8 @@ class Borrower extends Model
         'phone',
         'address',
         'identification_number',
+        'id_document_path',
+        'id_document_original_name',
     ];
 
     public function loans()

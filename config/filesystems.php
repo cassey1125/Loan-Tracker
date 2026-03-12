@@ -15,6 +15,8 @@ return [
 
     'default' => env('FILESYSTEM_DISK', 'local'),
 
+    'borrower_id_disk' => env('BORROWER_ID_DISK', 'local'),
+
     /*
     |--------------------------------------------------------------------------
     | Filesystem Disks
