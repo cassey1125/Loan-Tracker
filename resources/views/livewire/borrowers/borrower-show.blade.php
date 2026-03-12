@@ -101,42 +101,6 @@
         </div>
     </div>
 
-    @if(auth()->user()?->canManageFinancialRecords())
-        <div class="bg-white shadow overflow-hidden sm:rounded-lg">
-            <div class="px-4 py-5 sm:px-6">
-                <h3 class="text-lg leading-6 font-medium text-gray-900">
-                    Upload Borrower ID
-                </h3>
-                <p class="mt-1 max-w-2xl text-sm text-gray-500">
-                    Upload a PDF or clear image of the borrower's government-issued ID.
-                </p>
-            </div>
-            <div class="border-t border-gray-200 px-4 py-5 sm:px-6">
-                <form wire:submit.prevent="saveIdDocument" class="space-y-4">
-                    <div>
-                        <label for="idDocument" class="block text-sm font-medium text-gray-700">ID file</label>
-                        <input type="file" wire:model="idDocument" id="idDocument" accept=".jpg,.jpeg,.png,.pdf" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border">
-                        @error('idDocument') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
-                        <div wire:loading wire:target="idDocument" class="mt-2 text-xs text-gray-500">Uploading selected file...</div>
-                    </div>
-
-                    @if ($idDocument)
-                        <div class="rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-700">
-                            Selected: {{ $idDocument->getClientOriginalName() }}
-                        </div>
-                    @endif
-
-                    <div class="flex items-center justify-between gap-3">
-                        <p class="text-xs text-gray-500">Allowed formats: JPG, PNG, PDF. Maximum size: 5 MB.</p>
-                        <button type="submit" class="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2" wire:loading.attr="disabled" wire:target="idDocument,saveIdDocument">
-                            {{ $borrower->id_document_path ? 'Replace ID' : 'Upload ID' }}
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    @endif
-
     <!-- Loan History -->
     <div class="bg-white shadow overflow-hidden sm:rounded-lg">
         <div class="px-4 py-5 sm:px-6 flex justify-between items-center">
