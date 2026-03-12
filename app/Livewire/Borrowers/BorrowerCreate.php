@@ -34,12 +34,13 @@ class BorrowerCreate extends Component
             Arr::except($validated, ['idDocument'])
         );
 
-        if ($this->idDocument) {
+        $file = $validated['idDocument'] ?? null;
+        if ($file) {
             $disk = (string) config('filesystems.borrower_id_disk', 'local');
-            $path = $this->idDocument->store("borrower-ids/{$borrower->id}", $disk);
+            $path = $file->store("borrower-ids/{$borrower->id}", $disk);
             $borrower->update([
                 'id_document_path' => $path,
-                'id_document_original_name' => $this->idDocument->getClientOriginalName(),
+                'id_document_original_name' => $file->getClientOriginalName(),
             ]);
         }
 

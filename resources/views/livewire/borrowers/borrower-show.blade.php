@@ -65,9 +65,30 @@
                     <dd class="mt-1 text-sm sm:mt-0 sm:col-span-2">
                         @if ($borrower->id_document_path)
                             @if(auth()->user()?->canManageFinancialRecords())
-                                <a href="{{ route('borrowers.id-document.download', $borrower) }}" class="inline-flex items-center rounded-md border border-indigo-200 bg-indigo-50 px-3 py-2 text-sm font-medium text-indigo-700 hover:bg-indigo-100">
-                                    Download {{ $borrower->id_document_original_name ?? 'ID document' }}
-                                </a>
+                                @php
+                                    $idExt = $borrower->id_document_original_name
+                                        ? strtolower(pathinfo($borrower->id_document_original_name, PATHINFO_EXTENSION))
+                                        : '';
+                                    $isImage = in_array($idExt, ['jpg', 'jpeg', 'png']);
+                                @endphp
+                                @if ($isImage)
+                                    <div class="space-y-2">
+                                        <img src="{{ route('borrowers.id-document.download', $borrower) }}"
+                                             alt="Borrower ID"
+                                             class="max-w-xs rounded-md border border-gray-200 shadow-sm">
+                                        <div>
+                                            <a href="{{ route('borrowers.id-document.download', $borrower) }}"
+                                               download="{{ $borrower->id_document_original_name }}"
+                                               class="text-xs text-indigo-600 hover:text-indigo-800 underline">
+                                                Download original
+                                            </a>
+                                        </div>
+                                    </div>
+                                @else
+                                    <a href="{{ route('borrowers.id-document.download', $borrower) }}" class="inline-flex items-center rounded-md border border-indigo-200 bg-indigo-50 px-3 py-2 text-sm font-medium text-indigo-700 hover:bg-indigo-100">
+                                        Download {{ $borrower->id_document_original_name ?? 'ID document' }}
+                                    </a>
+                                @endif
                             @else
                                 <span class="text-gray-900">ID document on file</span>
                             @endif

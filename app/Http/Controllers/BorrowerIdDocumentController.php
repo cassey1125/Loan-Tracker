@@ -15,9 +15,13 @@ class BorrowerIdDocumentController extends Controller
         $disk = (string) config('filesystems.borrower_id_disk', 'local');
         abort_unless(Storage::disk($disk)->exists($borrower->id_document_path), 404);
 
-        return Storage::disk($disk)->download(
-            $borrower->id_document_path,
-            $borrower->id_document_original_name ?: basename($borrower->id_document_path)
-        );
+        $filename = $borrower->id_document_original_name ?: basename($borrower->id_document_path);
+        $extension = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+
+        if (in_array($extension, ['jpg', 'jpeg', 'png'], true)) {
+            return Storage::disk($disk)->response($borrower->id_document_path, $filename);
+        }
+
+        return Storage::disk($disk)->download($borrower->id_document_path, $filename);
     }
 }
