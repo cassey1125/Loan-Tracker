@@ -61,6 +61,7 @@
                             <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
                             <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Current Role</th>
                             <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Change Role</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Delete User</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200 bg-white">
@@ -87,6 +88,15 @@
                                         </button>
                                     </form>
                                 </td>
+                                <td class="px-4 py-3 text-sm">
+                                    <form method="POST" action="{{ route('admin.roles.destroy', $managedUser) }}" class="user-delete-form" data-user-name="{{ $managedUser->name }}">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="px-3 py-1.5 rounded bg-red-600 text-white text-xs font-semibold hover:bg-red-700">
+                                            Delete
+                                        </button>
+                                    </form>
+                                </td>
                             </tr>
                         @endforeach
                     </tbody>
@@ -101,6 +111,16 @@
                 const selectedRole = form.querySelector('.role-change-select')?.value || '';
                 const userName = form.dataset.userName || 'this user';
                 const ok = window.confirm(`Change role for ${userName} to ${selectedRole}?`);
+                if (!ok) {
+                    event.preventDefault();
+                }
+            });
+        });
+
+        document.querySelectorAll('.user-delete-form').forEach((form) => {
+            form.addEventListener('submit', (event) => {
+                const userName = form.dataset.userName || 'this user';
+                const ok = window.confirm(`Delete account for ${userName}? This cannot be undone.`);
                 if (!ok) {
                     event.preventDefault();
                 }

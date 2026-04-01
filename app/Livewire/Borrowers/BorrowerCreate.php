@@ -4,49 +4,26 @@ namespace App\Livewire\Borrowers;
 
 use App\Http\Requests\StoreBorrowerRequest;
 use App\Services\Borrower\BorrowerService;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
-use Livewire\WithFileUploads;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class BorrowerCreate extends Component
 {
-    use WithFileUploads;
-
     public $first_name;
     public $last_name;
-    public $phone;
-    public $idDocument;
+    public $address;
 
     public function save(BorrowerService $service)
     {
         $this->ensureCanManageFinancialRecords();
 
-        $validated = $this->validate(
-            array_merge(
-                (new StoreBorrowerRequest())->rules(),
-                ['idDocument' => ['nullable', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:5120']]
-            )
-        );
+        $validated = $this->validate((new StoreBorrowerRequest())->rules());
 
-        $borrower = $service->createBorrower(
-            Arr::except($validated, ['idDocument'])
-        );
+        $service->createBorrower($validated);
 
-        $file = $validated['idDocument'] ?? null;
-        if ($file) {
-            $disk = (string) config('filesystems.borrower_id_disk', 'local');
-            $path = $file->store("borrower-ids/{$borrower->id}", $disk);
-            $borrower->update([
-                'id_document_path' => $path,
-                'id_document_original_name' => $file->getClientOriginalName(),
-            ]);
-        }
-
-        session()->flash('message', 'Borrower created successfully.');
-
-        return redirect()->route('borrowers.index');
+        return redirect()
+            ->route('borrowers.index')
+            ->with('message', 'Borrower created successfully.');
     }
 
     public function render()

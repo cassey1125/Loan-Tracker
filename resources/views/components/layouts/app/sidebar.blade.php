@@ -21,6 +21,9 @@
                     </x-slot:icon>
                     {{ __('Dashboard') }}
                 </flux:sidebar.item>
+            </flux:sidebar.group>
+
+            <flux:sidebar.group :heading="__('Lending')" class="app-sidebar-group grid">
                 <flux:sidebar.item :href="route('borrowers.index')" :current="request()->routeIs('borrowers.*')" wire:navigate class="app-sidebar-item">
                     <x-slot:icon>
                         <span class="material-icons app-sidebar-icon">group</span>
@@ -39,18 +42,21 @@
                     </x-slot:icon>
                     {{ __('Payments') }}
                 </flux:sidebar.item>
-                <flux:sidebar.item :href="route('funds')" :current="request()->routeIs('funds')" wire:navigate class="app-sidebar-item">
-                    <x-slot:icon>
-                        <span class="material-icons app-sidebar-icon">account_balance_wallet</span>
-                    </x-slot:icon>
-                    {{ __('Funds') }}
-                </flux:sidebar.item>
                 <flux:sidebar.item :href="route('paid_loans')" :current="request()->routeIs('paid_loans')"
                     wire:navigate class="app-sidebar-item">
                     <x-slot:icon>
                         <span class="material-icons app-sidebar-icon">history</span>
                     </x-slot:icon>
                     {{ __('Paid Loans') }}
+                </flux:sidebar.item>
+            </flux:sidebar.group>
+
+            <flux:sidebar.group :heading="__('Finance')" class="app-sidebar-group grid">
+                <flux:sidebar.item :href="route('funds')" :current="request()->routeIs('funds')" wire:navigate class="app-sidebar-item">
+                    <x-slot:icon>
+                        <span class="material-icons app-sidebar-icon">account_balance_wallet</span>
+                    </x-slot:icon>
+                    {{ __('Funds') }}
                 </flux:sidebar.item>
                 <flux:sidebar.item :href="route('investor-profit')" :current="request()->routeIs('investor-profit')"
                     wire:navigate class="app-sidebar-item">
@@ -72,6 +78,9 @@
                     </x-slot:icon>
                     {{ __('Reports') }}
                 </flux:sidebar.item>
+            </flux:sidebar.group>
+
+            <flux:sidebar.group :heading="__('Operations')" class="app-sidebar-group grid">
                 <flux:sidebar.item :href="route('motor_rentals')" :current="request()->routeIs('motor_rentals')"
                     wire:navigate class="app-sidebar-item">
                     <x-slot:icon>
@@ -88,25 +97,30 @@
                         {{ __('Integrity Check') }}
                     </flux:sidebar.item>
                 @endif
-                @if(auth()->user()?->canManageUserRoles())
-                    <flux:sidebar.item :href="route('admin.roles.index')" :current="request()->routeIs('admin.roles.*')"
-                        wire:navigate class="app-sidebar-item">
-                        <x-slot:icon>
-                            <span class="material-icons app-sidebar-icon">admin_panel_settings</span>
-                        </x-slot:icon>
-                        {{ __('Role Management') }}
-                    </flux:sidebar.item>
-                @endif
-                @if(auth()->user()?->canManageBackups())
-                    <flux:sidebar.item :href="route('admin.backups.index')" :current="request()->routeIs('admin.backups.*')"
-                        wire:navigate class="app-sidebar-item">
-                        <x-slot:icon>
-                            <span class="material-icons app-sidebar-icon">backup</span>
-                        </x-slot:icon>
-                        {{ __('Backup Management') }}
-                    </flux:sidebar.item>
-                @endif
             </flux:sidebar.group>
+
+            @if(auth()->user()?->canManageUserRoles() || auth()->user()?->canManageBackups())
+                <flux:sidebar.group :heading="__('Administration')" class="app-sidebar-group grid">
+                    @if(auth()->user()?->canManageUserRoles())
+                        <flux:sidebar.item :href="route('admin.roles.index')" :current="request()->routeIs('admin.roles.*')"
+                            wire:navigate class="app-sidebar-item">
+                            <x-slot:icon>
+                                <span class="material-icons app-sidebar-icon">admin_panel_settings</span>
+                            </x-slot:icon>
+                            {{ __('Role Management') }}
+                        </flux:sidebar.item>
+                    @endif
+                    @if(auth()->user()?->canManageBackups())
+                        <flux:sidebar.item :href="route('admin.backups.index')" :current="request()->routeIs('admin.backups.*')"
+                            wire:navigate class="app-sidebar-item">
+                            <x-slot:icon>
+                                <span class="material-icons app-sidebar-icon">backup</span>
+                            </x-slot:icon>
+                            {{ __('Backup Management') }}
+                        </flux:sidebar.item>
+                    @endif
+                </flux:sidebar.group>
+            @endif
         </flux:sidebar.nav>
 
         <flux:spacer />
@@ -163,6 +177,7 @@
     {{ $slot }}
 
     @include('partials.sweetalert')
+    @livewireScripts
     @fluxScripts
 </body>
 

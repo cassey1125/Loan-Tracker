@@ -7,40 +7,37 @@ use App\Models\Payment;
 use App\Models\Transaction;
 use App\Models\Fund;
 use App\Repositories\PaymentRepository;
+use App\Services\Loan\LoanInstallmentService;
 use Illuminate\Support\Facades\DB;
 
 class PaymentService
 {
-    public function __construct(protected PaymentRepository $repository) {}
+    public function __construct(
+        protected PaymentRepository $repository,
+        protected LoanInstallmentService $installmentService
+    ) {}
 
     public function createPayment(array $data): Payment
     {
-        return $this->repository->create($data);
+        return DB::transaction(function () use ($data): Payment {
+            return $this->repository->create($data);
+        });
     }
 
     public function updatePayment(Payment $payment, array $data): Payment
     {
         return DB::transaction(function () use ($payment, $data) {
-            // 1. Revert effect of old payment on the old loan
-            $oldLoan = $payment->loan;
-            if ($oldLoan) {
-                $oldLoan->remaining_balance = round((float) $oldLoan->remaining_balance + (float) $payment->amount, 2);
-                $oldLoan->save();
-            }
+            // 1. Revert old schedule allocation and loan balance impact.
+            $this->installmentService->reversePayment($payment);
 
             // 2. Update payment details
             $payment->fill($data);
             $payment->save();
 
-            // 3. Apply effect of new payment on the new loan.
-            // Always fetch fresh to avoid Eloquent's cached relationship returning the old loan
-            // after fill() changed loan_id in memory.
+            // 3. Apply new schedule allocation and recalculate loan balance.
+            $this->installmentService->allocatePayment($payment);
+
             $newLoan = Loan::find($data['loan_id']);
-            if ($newLoan) {
-                $newBalance = round((float) $newLoan->remaining_balance - (float) $payment->amount, 2);
-                $newLoan->remaining_balance = max(0, $newBalance);
-                $newLoan->save();
-            }
 
             $loanId = $newLoan?->id ?? $payment->loan_id;
             $description = "Payment for Loan #{$loanId} - Ref: " . ($payment->reference_number ?? 'N/A');

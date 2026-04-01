@@ -8,10 +8,16 @@
         @endif
     </div>
 
+    @if (session('message'))
+        <div class="rounded-md border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">
+            {{ session('message') }}
+        </div>
+    @endif
+
     <!-- Filters and Search -->
     <div class="flex flex-col sm:flex-row gap-4 bg-white p-4 rounded-lg shadow-sm">
         <div class="flex-1">
-            <input type="text" wire:model.live.debounce.300ms="search" placeholder="Search by name or phone..." class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border">
+            <input type="text" wire:model.live.debounce.300ms="search" placeholder="Search by name or address..." class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border">
         </div>
     </div>
 
@@ -27,7 +33,7 @@
                             @endif
                         </th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Phone
+                            Address
                         </th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                     </tr>
@@ -45,7 +51,7 @@
                                 </div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                {{ $borrower->phone }}
+                                {{ $borrower->address }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                 <a href="{{ route('borrowers.show', $borrower) }}" class="text-indigo-600 hover:text-indigo-900 mr-3">View</a>

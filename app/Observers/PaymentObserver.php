@@ -5,10 +5,15 @@ namespace App\Observers;
 use App\Models\Fund;
 use App\Models\Payment;
 use App\Models\Transaction;
+use App\Services\Loan\LoanInstallmentService;
 use App\Services\Monitoring\AuditLogger;
 
 class PaymentObserver
 {
+    public function __construct(protected LoanInstallmentService $installmentService)
+    {
+    }
+
     /**
      * Handle the Payment "created" event.
      */
@@ -18,13 +23,8 @@ class PaymentObserver
         if (!$loan) {
             return;
         }
-        
-        // Update loan balance
-        $loan->remaining_balance = round((float) $loan->remaining_balance - (float) $payment->amount, 2);
-        if ($loan->remaining_balance < 0) {
-            $loan->remaining_balance = 0;
-        }
-        $loan->save();
+
+        $this->installmentService->allocatePayment($payment);
 
         // Record payment as income
         Transaction::create([
@@ -58,13 +58,7 @@ class PaymentObserver
 
     public function deleted(Payment $payment): void
     {
-        $loan = $payment->loan;
-        if ($loan) {
-            $restoredBalance = round((float) $loan->remaining_balance + (float) $payment->amount, 2);
-            $maxBalance = (float) $loan->total_payable;
-            $loan->remaining_balance = min($restoredBalance, $maxBalance);
-            $loan->save();
-        }
+        $this->installmentService->reversePayment($payment);
 
         Transaction::where('reference_type', Payment::class)
             ->where('reference_id', $payment->id)

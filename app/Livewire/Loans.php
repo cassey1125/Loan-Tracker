@@ -8,6 +8,7 @@ use App\Models\Borrower;
 use App\Models\Loan;
 use App\Repositories\LoanRepository;
 use App\Services\Loan\LoanService;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
@@ -19,6 +20,7 @@ class Loans extends Component
     public $due_date;
     public $payment_term;
     public $editingLoanId = null;
+    public $selectedScheduleLoanId = null;
 
     public function render(LoanRepository $repository)
     {
@@ -135,9 +137,42 @@ class Loans extends Component
         $this->dispatch('swal:notify', type: 'success', message: 'Loan updated successfully.');
     }
 
+    public function deleteLoan($id)
+    {
+        $this->ensureCanManageFinancialRecords();
+
+        $loan = Loan::findOrFail($id);
+
+        DB::transaction(function () use ($loan) {
+            $loan->payments()->forceDelete();
+            $loan->forceDelete();
+        });
+
+        if ((int) $this->editingLoanId === (int) $id) {
+            $this->cancelEdit();
+        }
+
+        if ((int) $this->selectedScheduleLoanId === (int) $id) {
+            $this->selectedScheduleLoanId = null;
+        }
+
+        session()->flash('message', 'Loan deleted successfully.');
+        $this->dispatch('swal:notify', type: 'success', message: 'Loan deleted successfully.');
+    }
+
     public function cancelEdit()
     {
         $this->reset(['borrower_id', 'amount', 'interest_rate', 'due_date', 'payment_term', 'editingLoanId']);
+    }
+
+    public function viewSchedule(int $loanId): void
+    {
+        $this->selectedScheduleLoanId = $loanId;
+    }
+
+    public function closeSchedule(): void
+    {
+        $this->selectedScheduleLoanId = null;
     }
 
     private function ensureCanManageFinancialRecords(): void

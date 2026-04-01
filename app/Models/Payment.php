@@ -28,4 +28,9 @@ class Payment extends Model
     {
         return $this->belongsTo(Loan::class);
     }
+
+    public function allocations()
+    {
+        return $this->hasMany(PaymentAllocation::class);
+    }
 }

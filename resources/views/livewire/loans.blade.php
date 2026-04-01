@@ -83,6 +83,7 @@
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Interest</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Payable</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Balance</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Terms</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Due Date</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
@@ -98,6 +99,7 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ number_format($loan->interest_amount, 2) }} ({{ $loan->interest_rate }}%)</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">{{ number_format($loan->total_payable, 2) }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ number_format($loan->remaining_balance, 2) }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $loan->installments->count() }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $loan->due_date->format('Y-m-d') }}</td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
@@ -108,8 +110,10 @@
                                 </span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <button wire:click="viewSchedule({{ $loan->id }})" class="text-sky-600 hover:text-sky-900 mr-3">Schedule</button>
                                 @if(auth()->user()?->canManageFinancialRecords())
                                     <button wire:click="editLoan({{ $loan->id }})" class="text-indigo-600 hover:text-indigo-900">Edit</button>
+                                    <button wire:click="deleteLoan({{ $loan->id }})" wire:confirm="Delete this loan and its payments? This cannot be undone." class="ml-3 text-red-600 hover:text-red-900">Delete</button>
                                 @else
                                     <span class="text-xs text-gray-400">View only</span>
                                 @endif
@@ -117,11 +121,69 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="9" class="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500">No loans found.</td>
+                            <td colspan="10" class="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500">No loans found.</td>
                         </tr>
                     @endforelse
                 </tbody>
             </table>
         </div>
     </div>
+
+    @if($selectedScheduleLoanId)
+        @php
+            $selectedLoan = $loans->firstWhere('id', $selectedScheduleLoanId);
+        @endphp
+
+        @if($selectedLoan)
+            <div class="bg-white shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
+                <div class="px-4 py-5 sm:px-6 flex items-center justify-between">
+                    <div>
+                        <h3 class="text-lg leading-6 font-medium text-gray-900">Installment Schedule - Loan #{{ $selectedLoan->id }}</h3>
+                        <p class="mt-1 max-w-2xl text-sm text-gray-500">Semi-monthly terms with exact due dates and due amounts.</p>
+                    </div>
+                    <button wire:click="closeSchedule" class="text-sm text-gray-500 hover:text-gray-700">Close</button>
+                </div>
+                <div class="overflow-x-auto border-t border-gray-200">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Term</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Due Date</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Principal</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Interest</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount Due</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Paid</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            @forelse($selectedLoan->installments as $term)
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ $term->installment_number }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ $term->due_date->format('Y-m-d') }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ number_format($term->principal_due, 2) }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ number_format($term->interest_due, 2) }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ number_format($term->amount_due, 2) }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ number_format($term->amount_paid, 2) }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
+                                            @if($term->status === 'paid') bg-green-100 text-green-800
+                                            @elseif($term->status === 'overdue') bg-red-100 text-red-800
+                                            @elseif($term->status === 'partial') bg-amber-100 text-amber-800
+                                            @else bg-gray-100 text-gray-700 @endif">
+                                            {{ ucfirst($term->status) }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="7" class="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500">No schedule terms generated yet.</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        @endif
+    @endif
 </div>

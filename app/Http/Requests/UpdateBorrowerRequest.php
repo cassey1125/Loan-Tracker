@@ -22,7 +22,6 @@ class UpdateBorrowerRequest extends FormRequest
                 'email', 
                 Rule::unique('borrowers', 'email')->ignore($this->route('borrower') ?? $this->id) // Handle both route param or ID if passed
             ],
-            'phone' => ['nullable', 'string', 'max:20'],
             'address' => ['nullable', 'string'],
             'identification_number' => ['nullable', 'string', 'max:50'],
         ];

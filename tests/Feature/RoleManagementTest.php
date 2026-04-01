@@ -69,4 +69,42 @@ class RoleManagementTest extends TestCase
             ->assertSee($admin->name)
             ->assertDontSee($staff->name);
     }
+
+    public function test_owner_can_delete_non_owner_user(): void
+    {
+        $owner = User::factory()->create(['role' => UserRole::OWNER]);
+        $staff = User::factory()->create(['role' => UserRole::STAFF]);
+
+        $this->actingAs($owner)
+            ->delete(route('admin.roles.destroy', $staff))
+            ->assertRedirect();
+
+        $this->assertDatabaseMissing('users', [
+            'id' => $staff->id,
+        ]);
+    }
+
+    public function test_owner_cannot_delete_last_owner(): void
+    {
+        $owner = User::factory()->create(['role' => UserRole::OWNER]);
+
+        $this->actingAs($owner)
+            ->delete(route('admin.roles.destroy', $owner))
+            ->assertRedirect()
+            ->assertSessionHas('error');
+
+        $this->assertDatabaseHas('users', [
+            'id' => $owner->id,
+        ]);
+    }
+
+    public function test_staff_cannot_delete_user_from_role_management(): void
+    {
+        $staff = User::factory()->create(['role' => UserRole::STAFF]);
+        $target = User::factory()->create(['role' => UserRole::STAFF]);
+
+        $this->actingAs($staff)
+            ->delete(route('admin.roles.destroy', $target))
+            ->assertForbidden();
+    }
 }

@@ -39,7 +39,7 @@ class BorrowerRepository
                 $q->where('first_name', 'like', "%{$search}%")
                   ->orWhere('last_name', 'like', "%{$search}%")
                   ->orWhere('email', 'like', "%{$search}%")
-                  ->orWhere('phone', 'like', "%{$search}%")
+                                    ->orWhere('address', 'like', "%{$search}%")
                   ->orWhere('identification_number', 'like', "%{$search}%");
             });
         }

@@ -31,10 +31,14 @@ class CreateNewUser implements CreatesNewUsers
             'password' => $this->passwordRules(),
         ])->validate();
 
+        $role = User::where('role', UserRole::OWNER)->exists()
+            ? UserRole::STAFF
+            : UserRole::OWNER;
+
         return User::create([
             'name' => $input['name'],
             'email' => $input['email'],
-            'role' => UserRole::STAFF,
+            'role' => $role,
             'password' => $input['password'],
         ]);
     }

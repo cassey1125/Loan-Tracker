@@ -60,4 +60,23 @@ class RoleManagementController extends Controller
 
         return back()->with('message', "Updated role for {$user->name} to {$targetRole->value}.");
     }
+
+    public function destroy(Request $request, User $user): RedirectResponse
+    {
+        if ($user->id === $request->user()->id) {
+            return back()->with('error', 'You cannot delete your own account from role management.');
+        }
+
+        if ($user->role === UserRole::OWNER) {
+            $ownerCount = User::where('role', UserRole::OWNER->value)->count();
+            if ($ownerCount <= 1) {
+                return back()->with('error', 'At least one owner must remain in the system.');
+            }
+        }
+
+        $name = $user->name;
+        $user->delete();
+
+        return back()->with('message', "Deleted user account for {$name}.");
+    }
 }

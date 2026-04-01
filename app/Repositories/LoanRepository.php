@@ -16,12 +16,12 @@ class LoanRepository
 
     public function getAll(): Collection
     {
-        return Loan::with('borrower')->latest()->get();
+        return Loan::with(['borrower', 'installments'])->latest()->get();
     }
 
     public function getActiveLoans(): Collection
     {
-        return Loan::with('borrower')
+        return Loan::with(['borrower', 'installments'])
             ->where('status', '!=', LoanStatus::PAID)
             ->get();
     }

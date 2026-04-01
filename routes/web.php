@@ -4,13 +4,10 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\IntegrityCheckController;
 use App\Http\Controllers\BackupManagementController;
-use App\Http\Controllers\BorrowerIdDocumentController;
 use App\Http\Controllers\RoleManagementController;
 
-use App\Livewire\Borrowers\BorrowerCreate;
-use App\Livewire\Borrowers\BorrowerEdit;
-use App\Livewire\Borrowers\BorrowerList;
-use App\Livewire\Borrowers\BorrowerShow;
+use App\Http\Requests\StoreBorrowerRequest;
+use App\Services\Borrower\BorrowerService;
 
 
 Route::get('/', function () {
@@ -46,13 +43,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return view('borrowers.create');
     })->middleware('role:owner,admin')->name('borrowers.create');
 
+    Route::post('borrowers', function (StoreBorrowerRequest $request, BorrowerService $service) {
+        $service->createBorrower($request->validated());
+
+        return redirect()
+            ->route('borrowers.index')
+            ->with('message', 'Borrower created successfully.');
+    })->middleware('role:owner,admin')->name('borrowers.store');
+
     Route::get('borrowers/{borrower}', function (App\Models\Borrower $borrower) {
         return view('borrowers.show', compact('borrower'));
     })->name('borrowers.show');
-
-    Route::get('borrowers/{borrower}/id-document', BorrowerIdDocumentController::class)
-        ->middleware('role:owner,admin')
-        ->name('borrowers.id-document.download');
 
     Route::get('borrowers/{borrower}/edit', function (App\Models\Borrower $borrower) {
         return view('borrowers.edit', compact('borrower'));
@@ -80,6 +81,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('admin/roles/{user}', [RoleManagementController::class, 'update'])
         ->middleware('role:owner')
         ->name('admin.roles.update');
+
+    Route::delete('admin/roles/{user}', [RoleManagementController::class, 'destroy'])
+        ->middleware('role:owner')
+        ->name('admin.roles.destroy');
 
     Route::get('admin/backups', [BackupManagementController::class, 'index'])
         ->middleware('role:owner,admin')

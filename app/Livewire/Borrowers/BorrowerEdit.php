@@ -12,14 +12,14 @@ class BorrowerEdit extends Component
     public Borrower $borrower;
     public $first_name;
     public $last_name;
-    public $phone;
+    public $address;
 
     public function mount(Borrower $borrower)
     {
         $this->borrower = $borrower;
         $this->first_name = $borrower->first_name;
         $this->last_name = $borrower->last_name;
-        $this->phone = $borrower->phone;
+        $this->address = $borrower->address;
     }
 
     public function update(BorrowerService $service)
@@ -30,7 +30,7 @@ class BorrowerEdit extends Component
         $validated = $this->validate([
             'first_name' => ['required', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
-            'phone' => ['nullable', 'string', 'max:20'],
+            'address' => ['nullable', 'string'],
         ]);
 
         $service->updateBorrower($this->borrower, $validated);

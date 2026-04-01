@@ -49,6 +49,11 @@ class Loan extends Model
         return $this->hasMany(Payment::class);
     }
 
+    public function installments()
+    {
+        return $this->hasMany(LoanInstallment::class)->orderBy('installment_number');
+    }
+
     public function getInvestorRateSplit(): array
     {
         $rate = (int) round((float) $this->interest_rate);
